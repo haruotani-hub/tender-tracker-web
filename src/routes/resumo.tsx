@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { Nav } from "@/components/counter";
-import { CURRENCIES, fmt, summarize, useCounts } from "@/lib/counter-store";
+import { CURRENCIES, clearIdentity, fmt, summarize, useCounts, useIdentity } from "@/lib/counter-store";
 
 export const Route = createFileRoute("/resumo")({
   head: () => ({
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/resumo")({
 
 function Resumo() {
   const counts = useCounts();
+  const { identity } = useIdentity();
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => setNow(new Date()), []);
 
@@ -34,6 +35,12 @@ function Resumo() {
       <header className="border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
         <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">Resumo final</p>
         <p className="font-mono text-3xl font-bold leading-tight">{totalPieces} peças</p>
+        {identity && (
+          <div className="mt-2 flex items-center justify-between gap-2 text-sm">
+            <span>{identity.name} · Matrícula <span className="font-mono">{identity.matricula}</span></span>
+            <button onClick={clearIdentity} className="rounded-lg bg-secondary px-3 py-1 font-display text-xs font-bold text-secondary-foreground">Trocar</button>
+          </div>
+        )}
         <div className="mt-2 flex items-center justify-between gap-2">
           <span className="font-mono text-xs">{stamp}</span>
           <button onClick={() => setNow(new Date())}
