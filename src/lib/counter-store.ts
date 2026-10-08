@@ -97,7 +97,7 @@ export function summarize(cur: Currency, counts: State) {
 // ---- Identificação do operador ----
 export type Identity = { name: string; matricula: string };
 const ID_KEY = "contador-identity";
-let identity: Identity | null = null;
+let identity = null as Identity | null;
 let ready = false;
 let idSnap = { identity, ready };
 const idListeners = new Set<() => void>();
