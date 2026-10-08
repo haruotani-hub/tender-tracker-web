@@ -71,8 +71,9 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
   const counts = useCounts();
   const s = summarize(cur, counts);
   const hasFamilies = cur.families.length > 1;
-  const [circ, non] = s.byFamily;
-  const diff = circ && non ? circ.value - non.value : 0;
+  const circV = s.byFamily.filter((b) => b.family.circulating).reduce((a, b) => a + b.value, 0);
+  const nonV = s.byFamily.filter((b) => !b.family.circulating).reduce((a, b) => a + b.value, 0);
+  const diff = circV - nonV;
   const status =
     s.pieces === 0
       ? { text: "Aguardando contagem", tone: "text-muted-foreground" }
@@ -106,8 +107,8 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
                 <span className="font-mono text-sm font-bold">{fmt(cur.code, value)}</span>
               </div>
             )}
-            <Group cur={cur} f={f} kind="n" title="Cédulas" list={f.notes} />
-            <Group cur={cur} f={f} kind="c" title="Moedas" list={f.coins} />
+            {f.notes.length > 0 && <Group cur={cur} f={f} kind="n" title="Cédulas" list={f.notes} />}
+            {f.coins.length > 0 && <Group cur={cur} f={f} kind="c" title="Moedas" list={f.coins} />}
           </div>
         ))}
 
@@ -115,8 +116,8 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
           <div className="rounded-2xl border bg-card p-4">
             <p className="font-display text-sm font-bold">Conferência</p>
             <dl className="mt-2 space-y-1 font-mono text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Circulante (2ª família)</dt><dd>{fmt(cur.code, circ!.value)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Não circulante (1ª família)</dt><dd>{fmt(cur.code, non!.value)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Circulante (cédulas e moedas)</dt><dd>{fmt(cur.code, circV)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Dilacerado (não circulante)</dt><dd>{fmt(cur.code, nonV)}</dd></div>
             </dl>
             <p className={`mt-3 border-t pt-3 font-display text-lg font-extrabold ${status.tone}`}>{status.text}</p>
           </div>

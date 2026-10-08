@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type Family = { id: string; title: string; notes: number[]; coins: number[] };
+export type Family = { id: string; title: string; notes: number[]; coins: number[]; circulating?: boolean };
 export type Currency = {
   code: "BRL" | "EUR" | "USD";
   slug: "/" | "/euro" | "/dolar";
@@ -10,6 +10,9 @@ export type Currency = {
 };
 
 // valores em centavos
+const N2 = [20000, 10000, 5000, 2000, 1000, 500, 200];
+const N1 = [10000, 5000, 1000, 500, 100];
+
 export const CURRENCIES: Currency[] = [
   {
     code: "BRL",
@@ -17,8 +20,11 @@ export const CURRENCIES: Currency[] = [
     name: "Real",
     symbol: "R$",
     families: [
-      { id: "f2", title: "2ª família do Real · Circulante", notes: [20000, 10000, 5000, 2000, 1000, 500, 200], coins: [100, 50, 25, 10, 5, 1] },
-      { id: "f1", title: "1ª família do Real · Não circulante", notes: [10000, 5000, 1000, 500, 100], coins: [100, 50, 25, 10, 5, 1] },
+      { id: "f2c", title: "2ª família · Circulante", notes: N2, coins: [], circulating: true },
+      { id: "f2d", title: "2ª família · Dilacerado", notes: N2, coins: [] },
+      { id: "f1c", title: "1ª família · Circulante", notes: N1, coins: [], circulating: true },
+      { id: "f1d", title: "1ª família · Dilacerado", notes: N1, coins: [] },
+      { id: "coins", title: "Moedas", notes: [], coins: [100, 50, 25, 10, 5, 1], circulating: true },
     ],
   },
   {
