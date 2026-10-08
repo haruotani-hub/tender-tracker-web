@@ -93,3 +93,46 @@ export function summarize(cur: Currency, counts: State) {
   });
   return { value, pieces, byFamily };
 }
+
+// ---- Identificação do operador ----
+export type Identity = { name: string; matricula: string };
+const ID_KEY = "contador-identity";
+let identity: Identity | null = null;
+let ready = false;
+let idSnap = { identity, ready };
+const idListeners = new Set<() => void>();
+const emitId = () => {
+  idSnap = { identity, ready };
+  idListeners.forEach((l) => l());
+};
+const serverIdSnap = { identity: null as Identity | null, ready: false };
+
+export const loadIdentity = () => {
+  try {
+    const raw = sessionStorage.getItem(ID_KEY);
+    identity = raw ? (JSON.parse(raw) as Identity) : null;
+  } catch {
+    identity = null;
+  }
+  ready = true;
+  emitId();
+};
+export const saveIdentity = (i: Identity) => {
+  identity = i;
+  try { sessionStorage.setItem(ID_KEY, JSON.stringify(i)); } catch { /* ignore */ }
+  emitId();
+};
+export const clearIdentity = () => {
+  identity = null;
+  try { sessionStorage.removeItem(ID_KEY); } catch { /* ignore */ }
+  emitId();
+};
+export const useIdentity = () =>
+  useSyncExternalStore(
+    (l) => {
+      idListeners.add(l);
+      return () => idListeners.delete(l);
+    },
+    () => idSnap,
+    () => serverIdSnap,
+  );
