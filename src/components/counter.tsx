@@ -115,8 +115,8 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
           <div className="rounded-2xl border bg-card p-4">
             <p className="font-display text-sm font-bold">Conferência</p>
             <dl className="mt-2 space-y-1 font-mono text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Circulante (2ª família)</dt><dd>{fmt(cur.code, circ.value)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Não circulante (1ª família)</dt><dd>{fmt(cur.code, non.value)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Circulante (2ª família)</dt><dd>{fmt(cur.code, circ!.value)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Não circulante (1ª família)</dt><dd>{fmt(cur.code, non!.value)}</dd></div>
             </dl>
             <p className={`mt-3 border-t pt-3 font-display text-lg font-extrabold ${status.tone}`}>{status.text}</p>
           </div>

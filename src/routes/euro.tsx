@@ -13,5 +13,5 @@ export const Route = createFileRoute("/euro")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <CurrencyPage cur={CURRENCIES[1]} />,
+  component: () => <CurrencyPage cur={CURRENCIES[1]!} />,
 });
