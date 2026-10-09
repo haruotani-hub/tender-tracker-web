@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import {
-  EGTTVS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
+  EGTTVS, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
 } from "@/lib/counter-store";
 
 export const inputCls =
@@ -61,7 +61,10 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [uf, setUf] = useState("");
   const [turno, setTurno] = useState("");
   const [data, setData] = useState("");
+  const [tipo, setTipo] = useState("");
   const [saldo, setSaldo] = useState("");
+  const [sEur, setSEur] = useState("");
+  const [sUsd, setSUsd] = useState("");
   useEffect(() => loadSession(), []);
 
   if (!ready) return null;
@@ -100,20 +103,34 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   }
 
   if (!session.startedAt) {
-    const cents = parseMoney(saldo);
-    const ok = turno && data && saldo.trim();
+    const ok = tipo && turno && data;
     return (
       <Shell step={3} title="Mapa da EGTTV">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (ok) updateSession({ turno, dataMapa: data, saldo: cents, startedAt: new Date().toISOString() }); }}>
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (ok) updateSession({ turno, dataMapa: data, saldo: parseMoney(saldo), saldoEur: parseMoney(sEur), saldoUsd: parseMoney(sUsd), tipo, startedAt: new Date().toISOString() }); }}>
           <p className="rounded-lg bg-secondary px-3 py-2 text-sm">{session.egttv} · {session.cidade}/{session.uf}</p>
+          <div>
+            <span className="font-display text-sm font-bold">Tipo de conferência</span>
+            <div className="mt-1 grid grid-cols-2 gap-2">
+              {TIPOS.map((t) => (
+                <button key={t} type="button" onClick={() => setTipo(t)}
+                  className={`h-12 rounded-lg border font-display font-bold ${tipo === t ? "bg-primary text-primary-foreground" : "bg-card"}`}>{t}</button>
+              ))}
+            </div>
+          </div>
           <label className="block"><span className="font-display text-sm font-bold">Turno</span>
             <select value={turno} onChange={(e) => setTurno(e.target.value)} className={inputCls}>
               <option value="">Selecione…</option>{TURNOS.map((x) => <option key={x}>{x}</option>)}
             </select></label>
           <label className="block"><span className="font-display text-sm font-bold">Data do mapa</span>
             <input type="date" value={data} onChange={(e) => setData(e.target.value)} className={inputCls} /></label>
-          <label className="block"><span className="font-display text-sm font-bold">Saldo do mapa (R$)</span>
+          <label className="block"><span className="font-display text-sm font-bold">Saldo do mapa · Real (R$)</span>
             <input inputMode="decimal" placeholder="0,00" value={saldo} onChange={(e) => setSaldo(e.target.value.replace(/[^\d.,]/g, ""))}
+              className={`${inputCls} font-mono`} /></label>
+          <label className="block"><span className="font-display text-sm font-bold">Saldo do mapa · Dólar (US$)</span>
+            <input inputMode="decimal" placeholder="0,00" value={sUsd} onChange={(e) => setSUsd(e.target.value.replace(/[^\d.,]/g, ""))}
+              className={`${inputCls} font-mono`} /></label>
+          <label className="block"><span className="font-display text-sm font-bold">Saldo do mapa · Euro (€)</span>
+            <input inputMode="decimal" placeholder="0,00" value={sEur} onChange={(e) => setSEur(e.target.value.replace(/[^\d.,]/g, ""))}
               className={`${inputCls} font-mono`} /></label>
           <button type="submit" disabled={!ok} className={btnCls}>Iniciar conferência</button>
         </form>

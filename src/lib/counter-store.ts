@@ -32,14 +32,14 @@ export const CURRENCIES: Currency[] = [
     slug: "/euro",
     name: "Euro",
     symbol: "€",
-    families: [{ id: "all", title: "Euro", notes: [50000, 20000, 10000, 5000, 2000, 1000, 500], coins: [200, 100, 50, 20, 10, 5, 2, 1] }],
+    families: [{ id: "all", title: "Euro", notes: [50000, 20000, 10000, 5000, 2000, 1000, 500], coins: [] }],
   },
   {
     code: "USD",
     slug: "/dolar",
     name: "Dólar",
     symbol: "US$",
-    families: [{ id: "all", title: "Dólar", notes: [10000, 5000, 2000, 1000, 500, 200, 100], coins: [100, 50, 25, 10, 5, 1] }],
+    families: [{ id: "all", title: "Dólar", notes: [10000, 5000, 2000, 1000, 500, 200, 100], coins: [] }],
   },
 ];
 
@@ -104,6 +104,9 @@ export type Session = {
   turno: string;
   dataMapa: string;
   saldo: number; // centavos (Real)
+  saldoEur: number;
+  saldoUsd: number;
+  tipo: string;
   startedAt: string | null;
   justificativa: string;
   entrada15: boolean | null;
@@ -113,11 +116,14 @@ export type Session = {
 };
 export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte"];
 export const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+export const TIPOS = ["Agência", "PAE"];
+export const saldoOf = (s: Session, code: string) =>
+  code === "BRL" ? s.saldo : code === "EUR" ? s.saldoEur : s.saldoUsd;
 export const TURNOS = ["Matutino", "Vespertino", "Noturno"];
 
 const S_KEY = "contador-session";
 const blank = (): Session => ({
-  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0,
+  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "",
   startedAt: null, justificativa: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
 });
 let session: Session = blank();
