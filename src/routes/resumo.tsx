@@ -4,7 +4,7 @@ import { Printer } from "lucide-react";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
 import {
-  CURRENCIES, fmt, fmtDateTime, resetAll, summarize, updateSession, useCounts, useSession, type Person,
+  CURRENCIES, fmt, saldoOf, fmtDateTime, resetAll, summarize, updateSession, useCounts, useSession, type Person,
 } from "@/lib/counter-store";
 
 export const Route = createFileRoute("/resumo")({
@@ -48,10 +48,10 @@ function Resumo() {
   const [staff, setStaff] = useState<Person[]>(ss.egttvStaff.length ? ss.egttvStaff : [{ name: "", matricula: "" }]);
 
   const rows = CURRENCIES.map((c) => ({ c, s: summarize(c, counts) }));
-  const brl = rows[0]!.s.value;
-  const diff = brl - ss.saldo;
+  const diffs = rows.map(({ c, s }) => ({ c, mapa: saldoOf(ss, c.code), counted: s.value, d: s.value - saldoOf(ss, c.code) }));
+  const hasDiff = diffs.some((x) => x.d !== 0);
   const finished = !!ss.endedAt;
-  const ok = (diff === 0 || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff);
+  const ok = (!hasDiff || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
@@ -59,10 +59,14 @@ function Resumo() {
         <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">
           {finished ? "Relatório da conferência" : "Resumo"}
         </p>
-        <p className={`font-mono text-3xl font-bold leading-tight`}>
-          {diff === 0 ? "Sem diferença" : `${diff > 0 ? "Sobra" : "Falta"} ${fmt("BRL", Math.abs(diff))}`}
-        </p>
-        <p className="font-mono text-xs opacity-80">Mapa {fmt("BRL", ss.saldo)} · Contado {fmt("BRL", brl)}</p>
+        {diffs.map(({ c, mapa, counted, d }) => (
+          <div key={c.code} className="mt-1">
+            <p className="font-mono text-xl font-bold leading-tight">
+              {c.name}: {d === 0 ? "sem diferença" : `${d > 0 ? "sobra" : "falta"} ${fmt(c.code, Math.abs(d))}`}
+            </p>
+            <p className="font-mono text-xs opacity-80">Mapa {fmt(c.code, mapa)} · Contado {fmt(c.code, counted)}</p>
+          </div>
+        ))}
       </header>
 
       <main className="flex-1 space-y-4 px-4 py-5">
@@ -71,6 +75,7 @@ function Resumo() {
             {ss.employees.map((p, i) => (
               <div key={i} className="flex justify-between gap-2"><dt className="text-muted-foreground">Empregado {i + 1}</dt><dd className="text-right">{p.name} · {p.matricula}</dd></div>
             ))}
+            <div className="flex justify-between"><dt className="text-muted-foreground">Tipo</dt><dd>{ss.tipo}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">EGTTV</dt><dd>{ss.egttv}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Local</dt><dd>{ss.cidade}/{ss.uf}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Mapa</dt><dd>{ss.dataMapa.split("-").reverse().join("/")} · {ss.turno}</dd></div>
@@ -101,7 +106,7 @@ function Resumo() {
         {finished ? (
           <>
             <section className="space-y-1 rounded-2xl border bg-card p-4 font-mono text-sm">
-              {diff !== 0 && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
+              {hasDiff && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
               <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
               <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
               {ss.egttvStaff.map((p, i) => (
@@ -116,9 +121,9 @@ function Resumo() {
           </>
         ) : (
           <section className="space-y-4 rounded-2xl border bg-card p-4">
-            {diff !== 0 && (
+            {hasDiff && (
               <label className="block">
-                <span className="font-display text-sm font-bold text-destructive">Justifique a diferença de {fmt("BRL", Math.abs(diff))}</span>
+                <span className="font-display text-sm font-bold text-destructive">Justifique a(s) diferença(s) apontada(s)</span>
                 <textarea value={just} maxLength={1000} onChange={(e) => setJust(e.target.value)} rows={4}
                   className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
               </label>
@@ -131,7 +136,7 @@ function Resumo() {
             </div>
             <button disabled={!ok} className={btnCls}
               onClick={() => updateSession({
-                justificativa: diff === 0 ? "" : just.trim(), entrada15: e15, cinta,
+                justificativa: !hasDiff ? "" : just.trim(), entrada15: e15, cinta,
                 egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
                 endedAt: new Date().toISOString(),
               })}>

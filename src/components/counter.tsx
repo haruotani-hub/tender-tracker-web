@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
-  CURRENCIES, fmt, keyOf, resetCurrency, setQty, summarize, useCounts, useSession,
+  CURRENCIES, fmt, keyOf, saldoOf, resetCurrency, setQty, summarize, useCounts, useSession,
   type Currency, type Family,
 } from "@/lib/counter-store";
 
@@ -14,7 +14,8 @@ function Row({ cur, k, value }: { cur: Currency; k: string; value: number }) {
   const set = (n: number) => setQty(k, Math.max(0, Math.min(99999, n)));
   const l = label(cur.symbol, value);
   return (
-    <div className="flex items-center gap-2 rounded-xl border bg-card px-3 py-2">
+    <div className="space-y-2 rounded-xl border bg-card px-3 py-2">
+      <div className="flex items-center gap-2">
       <div className="min-w-0 flex-1">
         <div className="font-display text-base font-bold leading-tight">{l}</div>
         <div className="font-mono text-xs text-muted-foreground">{fmt(cur.code, value * qty)}</div>
@@ -33,6 +34,15 @@ function Row({ cur, k, value }: { cur: Currency; k: string; value: number }) {
         className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground active:scale-95">
         <Plus className="size-4" />
       </button>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {[-1000, -100, 100, 1000].map((d) => (
+          <button key={d} aria-label={`${d > 0 ? "Somar" : "Subtrair"} ${Math.abs(d)} em ${l}`} onClick={() => set(qty + d)}
+            className={`h-9 rounded-lg font-mono text-sm font-bold active:scale-95 ${d > 0 ? "bg-primary/15 text-primary" : "bg-secondary text-secondary-foreground"}`}>
+            {d > 0 ? "+" : "−"}{Math.abs(d)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -84,18 +94,19 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
           : { text: `Não circulante maior em ${fmt(cur.code, -diff)}`, tone: "text-destructive" };
 
   const { session } = useSession();
-  const isBRL = cur.code === "BRL";
-  const remaining = session.saldo - s.value;
+  const isBRL = true;
+  const mapa = saldoOf(session, cur.code);
+  const remaining = mapa - s.value;
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
       <header className="sticky top-0 z-10 flex items-start justify-between border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
         <div>
           <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">
-            {isBRL ? "Saldo restante" : cur.name} · {s.pieces} {s.pieces === 1 ? "peça" : "peças"}
+            {"Saldo restante · " + cur.name} · {s.pieces} {s.pieces === 1 ? "peça" : "peças"}
           </p>
-          <p className="font-mono text-4xl font-bold leading-tight">{fmt(cur.code, isBRL ? remaining : s.value)}</p>
+          <p className="font-mono text-4xl font-bold leading-tight">{fmt(cur.code, remaining)}</p>
           {isBRL && (
-            <p className="font-mono text-xs opacity-80">Mapa {fmt("BRL", session.saldo)} · Contado {fmt("BRL", s.value)}</p>
+            <p className="font-mono text-xs opacity-80">Mapa {fmt(cur.code, mapa)} · Contado {fmt(cur.code, s.value)}</p>
           )}
         </div>
         <button onClick={() => resetCurrency(cur.code)}
