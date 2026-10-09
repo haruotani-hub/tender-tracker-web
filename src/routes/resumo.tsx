@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw } from "lucide-react";
+import { Printer } from "lucide-react";
 import { Nav } from "@/components/counter";
-import { CURRENCIES, clearIdentity, fmt, summarize, useCounts, useIdentity } from "@/lib/counter-store";
+import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
+import {
+  CURRENCIES, fmt, fmtDateTime, resetAll, summarize, updateSession, useCounts, useSession, type Person,
+} from "@/lib/counter-store";
 
 export const Route = createFileRoute("/resumo")({
   head: () => ({
     meta: [
-      { title: "Resumo final da contagem — Real, Euro e Dólar" },
-      { name: "description", content: "Somatória final de quantidades e valores contados, com data e hora." },
-      { property: "og:title", content: "Resumo final da contagem" },
-      { property: "og:description", content: "Quantidades e valores de Real, Euro e Dólar com data e hora." },
+      { title: "Resumo e finalização da conferência" },
+      { name: "description", content: "Somatória final, diferença com o mapa da EGTTV, questionário e relatório da conferência." },
+      { property: "og:title", content: "Resumo da conferência" },
+      { property: "og:description", content: "Somatória, diferença, justificativa e relatório final." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -18,62 +21,126 @@ export const Route = createFileRoute("/resumo")({
   component: Resumo,
 });
 
+function YesNo({ label, value, onChange }: { label: string; value: boolean | null; onChange: (v: boolean) => void }) {
+  return (
+    <div>
+      <p className="font-display text-sm font-bold">{label}</p>
+      <div className="mt-1 grid grid-cols-2 gap-2">
+        {[true, false].map((v) => (
+          <button key={String(v)} type="button" onClick={() => onChange(v)}
+            className={`h-11 rounded-lg border font-display font-bold ${value === v ? "bg-primary text-primary-foreground" : "bg-card"}`}>
+            {v ? "Sim" : "Não"}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const yn = (v: boolean | null) => (v === null ? "—" : v ? "Sim" : "Não");
+
 function Resumo() {
   const counts = useCounts();
-  const { identity } = useIdentity();
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => setNow(new Date()), []);
+  const { session: ss } = useSession();
+  const [just, setJust] = useState(ss.justificativa);
+  const [e15, setE15] = useState<boolean | null>(ss.entrada15);
+  const [cinta, setCinta] = useState<boolean | null>(ss.cinta);
+  const [staff, setStaff] = useState<Person[]>(ss.egttvStaff.length ? ss.egttvStaff : [{ name: "", matricula: "" }]);
 
-  const stamp = now
-    ? now.toLocaleString("pt-BR", { dateStyle: "long", timeStyle: "medium" })
-    : "—";
   const rows = CURRENCIES.map((c) => ({ c, s: summarize(c, counts) }));
-  const totalPieces = rows.reduce((a, r) => a + r.s.pieces, 0);
+  const brl = rows[0]!.s.value;
+  const diff = brl - ss.saldo;
+  const finished = !!ss.endedAt;
+  const ok = (diff === 0 || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
       <header className="border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
-        <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">Resumo final</p>
-        <p className="font-mono text-3xl font-bold leading-tight">{totalPieces} peças</p>
-        {identity && (
-          <div className="mt-2 flex items-center justify-between gap-2 text-sm">
-            <span>{identity.name} · Matrícula <span className="font-mono">{identity.matricula}</span></span>
-            <button onClick={clearIdentity} className="rounded-lg bg-secondary px-3 py-1 font-display text-xs font-bold text-secondary-foreground">Trocar</button>
-          </div>
-        )}
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="font-mono text-xs">{stamp}</span>
-          <button onClick={() => setNow(new Date())}
-            className="flex items-center gap-1 rounded-lg bg-accent px-3 py-2 font-display text-xs font-bold text-accent-foreground active:scale-95">
-            <RefreshCw className="size-3.5" /> Atualizar
-          </button>
-        </div>
+        <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">
+          {finished ? "Relatório da conferência" : "Resumo"}
+        </p>
+        <p className={`font-mono text-3xl font-bold leading-tight`}>
+          {diff === 0 ? "Sem diferença" : `${diff > 0 ? "Sobra" : "Falta"} ${fmt("BRL", Math.abs(diff))}`}
+        </p>
+        <p className="font-mono text-xs opacity-80">Mapa {fmt("BRL", ss.saldo)} · Contado {fmt("BRL", brl)}</p>
       </header>
 
       <main className="flex-1 space-y-4 px-4 py-5">
+        <section className="rounded-2xl border bg-card p-4 font-mono text-sm">
+          <dl className="space-y-1">
+            {ss.employees.map((p, i) => (
+              <div key={i} className="flex justify-between gap-2"><dt className="text-muted-foreground">Empregado {i + 1}</dt><dd className="text-right">{p.name} · {p.matricula}</dd></div>
+            ))}
+            <div className="flex justify-between"><dt className="text-muted-foreground">EGTTV</dt><dd>{ss.egttv}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Local</dt><dd>{ss.cidade}/{ss.uf}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Mapa</dt><dd>{ss.dataMapa.split("-").reverse().join("/")} · {ss.turno}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Início</dt><dd>{fmtDateTime(ss.startedAt)}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Término</dt><dd>{fmtDateTime(ss.endedAt)}</dd></div>
+          </dl>
+        </section>
+
         {rows.map(({ c, s }) => (
           <section key={c.code} className="rounded-2xl border bg-card p-4">
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-lg font-extrabold">{c.name}</h2>
               <span className="font-mono text-xl font-bold">{fmt(c.code, s.value)}</span>
             </div>
-            <p className="font-mono text-xs text-muted-foreground">
-              {s.pieces} {s.pieces === 1 ? "peça" : "peças"}
-            </p>
+            <p className="font-mono text-xs text-muted-foreground">{s.pieces} {s.pieces === 1 ? "peça" : "peças"}</p>
             {c.families.length > 1 && (
               <dl className="mt-3 space-y-1 border-t pt-3 font-mono text-sm">
                 {s.byFamily.map(({ family, value, pieces }) => (
                   <div key={family.id} className="flex justify-between gap-2">
-                    <dt className="text-muted-foreground">{family.title} ({pieces})</dt>
-                    <dd>{fmt(c.code, value)}</dd>
+                    <dt className="text-muted-foreground">{family.title} ({pieces})</dt><dd>{fmt(c.code, value)}</dd>
                   </div>
                 ))}
               </dl>
             )}
           </section>
         ))}
+
+        {finished ? (
+          <>
+            <section className="space-y-1 rounded-2xl border bg-card p-4 font-mono text-sm">
+              {diff !== 0 && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
+              <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
+              <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
+              {ss.egttvStaff.map((p, i) => (
+                <p key={i}><span className="text-muted-foreground">EGTTV {i + 1}: </span>{p.name} · {p.matricula}</p>
+              ))}
+            </section>
+            <div className="grid grid-cols-2 gap-2 print:hidden">
+              <button onClick={() => window.print()} className={`${btnCls} flex items-center justify-center gap-2`}><Printer className="size-4" /> Imprimir</button>
+              <button onClick={() => { if (confirm("Iniciar nova conferência? Os dados atuais serão apagados.")) resetAll(); }}
+                className="h-12 rounded-lg border bg-card font-display font-bold">Nova conferência</button>
+            </div>
+          </>
+        ) : (
+          <section className="space-y-4 rounded-2xl border bg-card p-4">
+            {diff !== 0 && (
+              <label className="block">
+                <span className="font-display text-sm font-bold text-destructive">Justifique a diferença de {fmt("BRL", Math.abs(diff))}</span>
+                <textarea value={just} maxLength={1000} onChange={(e) => setJust(e.target.value)} rows={4}
+                  className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
+              </label>
+            )}
+            <YesNo label="Foi liberada a entrada em até 15 min?" value={e15} onChange={setE15} />
+            <YesNo label="Foi solicitada abertura de cinta(s) para conferência?" value={cinta} onChange={setCinta} />
+            <div>
+              <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
+              <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" />
+            </div>
+            <button disabled={!ok} className={btnCls}
+              onClick={() => updateSession({
+                justificativa: diff === 0 ? "" : just.trim(), entrada15: e15, cinta,
+                egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
+                endedAt: new Date().toISOString(),
+              })}>
+              Finalizar conferência
+            </button>
+          </section>
+        )}
       </main>
-      <Nav />
+      <div className="print:hidden"><Nav /></div>
     </div>
   );
 }

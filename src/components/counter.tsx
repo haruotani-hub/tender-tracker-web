@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
-  CURRENCIES, fmt, keyOf, resetCurrency, setQty, summarize, useCounts,
+  CURRENCIES, fmt, keyOf, resetCurrency, setQty, summarize, useCounts, useSession,
   type Currency, type Family,
 } from "@/lib/counter-store";
 
@@ -83,14 +83,20 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
           ? { text: `Circulante maior em ${fmt(cur.code, diff)}`, tone: "text-success" }
           : { text: `Não circulante maior em ${fmt(cur.code, -diff)}`, tone: "text-destructive" };
 
+  const { session } = useSession();
+  const isBRL = cur.code === "BRL";
+  const remaining = session.saldo - s.value;
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
       <header className="sticky top-0 z-10 flex items-start justify-between border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
         <div>
           <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">
-            {cur.name} · {s.pieces} {s.pieces === 1 ? "peça" : "peças"}
+            {isBRL ? "Saldo restante" : cur.name} · {s.pieces} {s.pieces === 1 ? "peça" : "peças"}
           </p>
-          <p className="font-mono text-4xl font-bold leading-tight">{fmt(cur.code, s.value)}</p>
+          <p className="font-mono text-4xl font-bold leading-tight">{fmt(cur.code, isBRL ? remaining : s.value)}</p>
+          {isBRL && (
+            <p className="font-mono text-xs opacity-80">Mapa {fmt("BRL", session.saldo)} · Contado {fmt("BRL", s.value)}</p>
+          )}
         </div>
         <button onClick={() => resetCurrency(cur.code)}
           className="flex items-center gap-1 rounded-lg bg-accent px-3 py-2 font-display text-xs font-bold text-accent-foreground active:scale-95">
