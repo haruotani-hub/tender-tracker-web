@@ -94,45 +94,68 @@ export function summarize(cur: Currency, counts: State) {
   return { value, pieces, byFamily };
 }
 
-// ---- Identificação do operador ----
-export type Identity = { name: string; matricula: string };
-const ID_KEY = "contador-identity";
-let identity = null as Identity | null;
-let ready = false;
-let idSnap = { identity, ready };
-const idListeners = new Set<() => void>();
-const emitId = () => {
-  idSnap = { identity, ready };
-  idListeners.forEach((l) => l());
+// ---- Sessão da conferência ----
+export type Person = { name: string; matricula: string };
+export type Session = {
+  employees: Person[];
+  egttv: string;
+  cidade: string;
+  uf: string;
+  turno: string;
+  dataMapa: string;
+  saldo: number; // centavos (Real)
+  startedAt: string | null;
+  justificativa: string;
+  entrada15: boolean | null;
+  cinta: boolean | null;
+  egttvStaff: Person[];
+  endedAt: string | null;
 };
-const serverIdSnap = { identity: null as Identity | null, ready: false };
+export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte"];
+export const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+export const TURNOS = ["Matutino", "Vespertino", "Noturno"];
 
-export const loadIdentity = () => {
+const S_KEY = "contador-session";
+const blank = (): Session => ({
+  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0,
+  startedAt: null, justificativa: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
+});
+let session: Session = blank();
+let sReady = false;
+let sSnap = { session, ready: sReady };
+const sListeners = new Set<() => void>();
+const serverSSnap = { session: blank(), ready: false };
+const persist = () => {
+  try { sessionStorage.setItem(S_KEY, JSON.stringify(session)); } catch { /* ignore */ }
+  sSnap = { session, ready: sReady };
+  sListeners.forEach((l) => l());
+};
+export const loadSession = () => {
   try {
-    const raw = sessionStorage.getItem(ID_KEY);
-    identity = raw ? (JSON.parse(raw) as Identity) : null;
-  } catch {
-    identity = null;
-  }
-  ready = true;
-  emitId();
+    const raw = sessionStorage.getItem(S_KEY);
+    session = raw ? { ...blank(), ...(JSON.parse(raw) as Session) } : blank();
+  } catch { session = blank(); }
+  sReady = true;
+  persist();
 };
-export const saveIdentity = (i: Identity) => {
-  identity = i;
-  try { sessionStorage.setItem(ID_KEY, JSON.stringify(i)); } catch { /* ignore */ }
-  emitId();
+export const updateSession = (p: Partial<Session>) => { session = { ...session, ...p }; persist(); };
+export const resetAll = () => {
+  session = blank();
+  state = {};
+  emit();
+  persist();
 };
-export const clearIdentity = () => {
-  identity = null;
-  try { sessionStorage.removeItem(ID_KEY); } catch { /* ignore */ }
-  emitId();
-};
-export const useIdentity = () =>
+export const useSession = () =>
   useSyncExternalStore(
-    (l) => {
-      idListeners.add(l);
-      return () => idListeners.delete(l);
-    },
-    () => idSnap,
-    () => serverIdSnap,
+    (l) => { sListeners.add(l); return () => sListeners.delete(l); },
+    () => sSnap,
+    () => serverSSnap,
   );
+
+export const parseMoney = (s: string) => {
+  const clean = s.replace(/[^\d,]/g, "").replace(",", ".");
+  const n = Number(clean);
+  return Number.isFinite(n) ? Math.round(n * 100) : 0;
+};
+export const fmtDateTime = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" }) : "—";
