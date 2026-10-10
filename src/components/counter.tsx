@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
-  CURRENCIES, fmt, keyOf, saldoOf, resetCurrency, setQty, summarize, useCounts, useSession,
+  CURRENCIES, fmt, keyOf, saldoOf, resetCurrency, setQty, summarize, updateSession, useCounts, useSession,
   type Currency, type Family,
 } from "@/lib/counter-store";
 
@@ -139,6 +139,13 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
             <p className={`mt-3 border-t pt-3 font-display text-lg font-extrabold ${status.tone}`}>{status.text}</p>
           </div>
         )}
+
+        <label className="block">
+          <span className="font-display text-sm font-bold">Observações · {cur.name}</span>
+          <textarea rows={3} maxLength={1000} value={session.obs?.[cur.code] ?? ""}
+            onChange={(e) => updateSession({ obs: { ...session.obs, [cur.code]: e.target.value } })}
+            className="mt-1 w-full rounded-lg border bg-card p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
+        </label>
       </main>
       <Nav />
     </div>
