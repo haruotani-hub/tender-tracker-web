@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
@@ -27,10 +28,10 @@ function YesNo({ label, value, onChange }: { label: string; value: boolean | nul
       <p className="font-display text-sm font-bold">{label}</p>
       <div className="mt-1 grid grid-cols-2 gap-2">
         {[true, false].map((v) => (
-          <button key={String(v)} type="button" onClick={() => onChange(v)}
+          <Button variant="ghost" key={String(v)} type="button" onClick={() => onChange(v)}
             className={`h-11 rounded-lg border font-display font-bold ${value === v ? "bg-primary text-primary-foreground" : "bg-card"}`}>
             {v ? "Sim" : "Não"}
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -56,7 +57,7 @@ function Resumo() {
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
       <header className="border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
-        <p className="font-display text-xs font-bold uppercase tracking-widest opacity-70">
+        <p className="font-display text-xs font-bold uppercase tracking-normal opacity-70">
           {finished ? "Relatório da conferência" : "Resumo"}
         </p>
         {diffs.map(({ c, mapa, counted, d }) => (
@@ -70,7 +71,7 @@ function Resumo() {
       </header>
 
       <main className="flex-1 space-y-4 px-4 py-5">
-        <section className="rounded-2xl border bg-card p-4 font-mono text-sm">
+        <section className="border-t border-border py-4 font-mono text-sm">
           <dl className="space-y-1">
             {ss.employees.map((p, i) => (
               <div key={i} className="flex justify-between gap-2"><dt className="text-muted-foreground">Empregado {i + 1}</dt><dd className="text-right">{p.name} · {p.matricula}</dd></div>
@@ -85,9 +86,9 @@ function Resumo() {
         </section>
 
         {rows.map(({ c, s }) => (
-          <section key={c.code} className="rounded-2xl border bg-card p-4">
+          <section key={c.code} className="border-t border-border py-4">
             <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-lg font-extrabold">{c.name}</h2>
+              <h2 className="font-display text-lg font-bold">{c.name}</h2>
               <span className="font-mono text-xl font-bold">{fmt(c.code, s.value)}</span>
             </div>
             <p className="font-mono text-xs text-muted-foreground">{s.pieces} {s.pieces === 1 ? "peça" : "peças"}</p>
@@ -106,7 +107,7 @@ function Resumo() {
 
         {finished ? (
           <>
-            <section className="space-y-1 rounded-2xl border bg-card p-4 font-mono text-sm">
+            <section className="space-y-1 border-t border-border py-4 font-mono text-sm">
               {hasDiff && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
               <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
               <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
@@ -115,13 +116,13 @@ function Resumo() {
               ))}
             </section>
             <div className="grid grid-cols-2 gap-2 print:hidden">
-              <button onClick={() => window.print()} className={`${btnCls} flex items-center justify-center gap-2`}><Printer className="size-4" /> Imprimir</button>
-              <button onClick={() => { if (confirm("Iniciar nova conferência? Os dados atuais serão apagados.")) resetAll(); }}
-                className="h-12 rounded-lg border bg-card font-display font-bold">Nova conferência</button>
+              <Button variant="ghost" onClick={() => window.print()} className={`${btnCls} flex items-center justify-center gap-2`}><Printer className="size-4" /> Imprimir</Button>
+              <Button variant="ghost" onClick={() => { if (confirm("Iniciar nova conferência? Os dados atuais serão apagados.")) resetAll(); }}
+                className="h-12 rounded-lg border bg-card font-display font-bold">Nova conferência</Button>
             </div>
           </>
         ) : (
-          <section className="space-y-4 rounded-2xl border bg-card p-4">
+          <section className="space-y-4 border-t border-border py-4">
             {hasDiff && (
               <label className="block">
                 <span className="font-display text-sm font-bold text-destructive">Justifique a(s) diferença(s) apontada(s)</span>
@@ -135,14 +136,14 @@ function Resumo() {
               <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
               <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" />
             </div>
-            <button disabled={!ok} className={btnCls}
+            <Button variant="ghost" disabled={!ok} className={btnCls}
               onClick={() => updateSession({
                 justificativa: !hasDiff ? "" : just.trim(), entrada15: e15, cinta,
                 egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
                 endedAt: new Date().toISOString(),
               })}>
               Finalizar conferência
-            </button>
+            </Button>
           </section>
         )}
       </main>

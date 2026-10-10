@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the visual identity in semantic tokens in src/styles.css and reuse the shared Button component across the conference screens, so appearance can change without changing counting rules.
