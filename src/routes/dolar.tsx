@@ -5,13 +5,16 @@ import { CURRENCIES } from "@/lib/counter-store";
 export const Route = createFileRoute("/dolar")({
   head: () => ({
     meta: [
-      { title: "Contador de Dólar — notas e moedas" },
-      { name: "description", content: "Conte notas e moedas de dólar e veja o total em US$." },
-      { property: "og:title", content: "Contador de Dólar" },
-      { property: "og:description", content: "Contagem de notas e moedas de dólar." },
+      { title: "Conferência de numerário · Dólar" },
+      { name: "description", content: "Contagem de cédulas de dólar, saldo do mapa e observações da conferência." },
+      { property: "og:title", content: "Conferência de numerário · Dólar" },
+      { property: "og:description", content: "Contagem de cédulas de dólar, saldo do mapa e observações da conferência." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <CurrencyPage cur={CURRENCIES[2]!} />,
+  component: () => {
+    const currency = CURRENCIES[2];
+    return currency ? <CurrencyPage cur={currency} /> : null;
+  },
 });
