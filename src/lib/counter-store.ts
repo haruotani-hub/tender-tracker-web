@@ -22,7 +22,6 @@ export const CURRENCIES: Currency[] = [
     families: [
       { id: "f2c", title: "2ª família · Circulante", notes: N2, coins: [], circulating: true },
       { id: "f2d", title: "2ª família · Dilacerado", notes: N2, coins: [] },
-      { id: "f1c", title: "1ª família · Circulante", notes: N1, coins: [], circulating: true },
       { id: "f1d", title: "1ª família · Dilacerado", notes: N1, coins: [] },
       { id: "coins", title: "Moedas", notes: [], coins: [100, 50, 25, 10, 5, 1], circulating: true },
     ],
@@ -107,6 +106,7 @@ export type Session = {
   saldoEur: number;
   saldoUsd: number;
   tipo: string;
+  obs: Record<string, string>;
   startedAt: string | null;
   justificativa: string;
   entrada15: boolean | null;
@@ -123,7 +123,7 @@ export const TURNOS = ["Matutino", "Vespertino", "Noturno"];
 
 const S_KEY = "contador-session";
 const blank = (): Session => ({
-  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "",
+  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "", obs: {},
   startedAt: null, justificativa: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
 });
 let session: Session = blank();
