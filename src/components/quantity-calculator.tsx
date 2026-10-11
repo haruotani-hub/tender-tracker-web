@@ -53,7 +53,7 @@ export function QuantityCalculator({ label, quantity, onTransfer }: { label: str
           if (!canTransferQuantity(result)) return;
           onTransfer(result);
           setOpen(false);
-        }} className="h-12 w-full gap-2 font-display font-bold"><ArrowDownToLine className="size-4" /> Transferir resultado</Button>
+        }} className="h-12 w-full gap-2 font-display font-bold"><ArrowDownToLine className="size-4" /> Transpor valor</Button>
       </DialogContent>
     </Dialog>
   );
