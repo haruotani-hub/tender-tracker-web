@@ -52,7 +52,7 @@ function Resumo() {
   const diffs = rows.map(({ c, s }) => ({ c, mapa: saldoOf(ss, c.code), counted: s.value, d: s.value - saldoOf(ss, c.code) }));
   const hasDiff = diffs.some((x) => x.d !== 0);
   const finished = !!ss.endedAt;
-  const ok = (!hasDiff || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff);
+  const ok = (!hasDiff || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff, "livre");
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
@@ -134,7 +134,7 @@ function Resumo() {
             <YesNo label="Foi solicitada abertura de cinta(s) para conferência?" value={cinta} onChange={setCinta} />
             <div>
               <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
-              <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" />
+              <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" matKind="livre" />
             </div>
             <Button variant="ghost" disabled={!ok} className={btnCls}
               onClick={() => updateSession({
