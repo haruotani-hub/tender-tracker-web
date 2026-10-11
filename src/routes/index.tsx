@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Conferência de Valores - TCV" },
       { name: "description", content: "Contagem de cédulas e moedas, com conferência do saldo do mapa." },
-      { property: "og:title", content: "Conferência de Valores" },
+      { property: "og:title", content: "Conferência de Valores - TCV" },
       { property: "og:description", content: "Contagem de cédulas e moedas, com conferência do saldo do mapa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

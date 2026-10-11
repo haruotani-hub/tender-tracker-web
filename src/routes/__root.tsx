@@ -79,9 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Contador de Dinheiro — Conferência de caixa em R$" },
+      { title: "Conferência de Valores - TCV" },
       { name: "description", content: "Conte notas e moedas em reais e confira a diferença com o valor esperado." },
-      { property: "og:title", content: "Contador de Dinheiro" },
+      { property: "og:title", content: "Conferência de Valores - TCV" },
       { property: "og:description", content: "Conte notas e moedas em reais e confira a diferença com o valor esperado." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

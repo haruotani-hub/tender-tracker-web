@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep the visual identity in semantic tokens in src/styles.css and reuse the shared Button component across the conference screens, so appearance can change without changing counting rules.
+- Keep the quantity calculator in a shared dialog and evaluate arithmetic through a restricted expression library, so all currencies transfer results consistently without executing code.
