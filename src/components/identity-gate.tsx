@@ -10,10 +10,23 @@ export const inputCls =
 export const btnCls =
   "h-12 w-full rounded-lg bg-primary font-display text-base font-bold text-primary-foreground disabled:opacity-40";
 
-export const validPeople = (ps: Person[]) =>
-  ps.length > 0 && ps.every((p) => p.name.trim().split(/\s+/).length >= 2 && p.matricula.trim().length > 0);
+// Primeira letra de cada nome em maiúscula, mantendo o resto como digitado
+export const maskName = (v: string) =>
+  v
+    .replace(/[^\p{L}\p{M}'’\- ]/gu, "")
+    .replace(/(^\s*|[ \t])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toUpperCase());
 
-export function PeopleEditor({ people, onChange, matLabel }: { people: Person[]; onChange: (p: Person[]) => void; matLabel: string }) {
+// Matrícula Caixa: letra C seguida de até 6 números (ex.: C123456)
+export const maskCaixaMatricula = (v: string) => `C${v.toUpperCase().replace(/[^0-9]/g, "").slice(0, 6)}`;
+
+export type MatKind = "caixa" | "livre";
+export const matriculaOk = (m: string, kind: MatKind) =>
+  kind === "caixa" ? /^C\d{6}$/.test(m) : m.trim().length > 0;
+
+export const validPeople = (ps: Person[], kind: MatKind = "caixa") =>
+  ps.length > 0 && ps.every((p) => p.name.trim().split(/\s+/).length >= 2 && matriculaOk(p.matricula, kind));
+
+export function PeopleEditor({ people, onChange, matLabel, matKind = "caixa" }: { people: Person[]; onChange: (p: Person[]) => void; matLabel: string; matKind?: MatKind }) {
   const set = (i: number, p: Partial<Person>) => onChange(people.map((x, j) => (j === i ? { ...x, ...p } : x)));
   return (
     <div className="space-y-4">
@@ -28,9 +41,13 @@ export function PeopleEditor({ people, onChange, matLabel }: { people: Person[];
             )}
           </div>
           <label className="block"><span className="font-display text-sm font-bold">Nome completo</span>
-            <input value={p.name} onChange={(e) => set(i, { name: e.target.value })} className={inputCls} /></label>
+            <input value={p.name} onChange={(e) => set(i, { name: maskName(e.target.value) })} className={inputCls} /></label>
           <label className="block"><span className="font-display text-sm font-bold">{matLabel}</span>
-            <input value={p.matricula} onChange={(e) => set(i, { matricula: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "") })}
+            <input
+              value={p.matricula}
+              onChange={(e) => set(i, { matricula: matKind === "caixa" ? maskCaixaMatricula(e.target.value) : e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "") })}
+              placeholder={matKind === "caixa" ? "C000000" : undefined}
+              inputMode={matKind === "caixa" ? "numeric" : "text"}
               className={`${inputCls} font-mono`} /></label>
         </div>
       ))}
@@ -80,7 +97,7 @@ export function IdentityGate({ children }: { children: ReactNode }) {
         <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (validPeople(people)) updateSession({ employees: people.map((p) => ({ name: p.name.trim(), matricula: p.matricula })) }); }}>
           <PeopleEditor people={people} onChange={setPeople} matLabel="Matrícula Caixa" />
           <Button variant="ghost" type="submit" disabled={!validPeople(people)} className={btnCls}>Continuar</Button>
-          <p className="text-xs text-muted-foreground">Até 3 empregados. Informe nome e sobrenome e matrícula.</p>
+          <p className="text-xs text-muted-foreground">Até 3 empregados. Nome e sobrenome; matrícula no formato C seguido de 6 números (ex.: C123456).</p>
         </form>
       </Shell>
     );
