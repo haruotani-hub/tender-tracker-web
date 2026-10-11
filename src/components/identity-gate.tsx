@@ -48,7 +48,7 @@ function Shell({ step, title, children }: { step: number; title: string; childre
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-8 font-sans">
       <div className="mb-8 border-b border-border pb-5">
-        <p className="font-display text-lg font-bold text-primary">Conferência de numerário</p>
+        <p className="font-display text-lg font-bold text-primary">Conferência de Valores - TCV</p>
         <div className="mt-3 h-1 w-12 bg-brand-orange" />
       </div>
       <p className="font-display text-xs font-bold uppercase tracking-normal text-muted-foreground">Etapa {step} de 3</p>
