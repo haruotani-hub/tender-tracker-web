@@ -6,6 +6,6 @@
 
 # Nome e calculadora de contagem
 
-- [ ] Atualizar a expressão para Conferência de Valores - TCV.
-- [ ] Adicionar calculadora flutuante ao selecionar uma quantidade, com transferência do resultado.
-- [ ] Verificar cálculos e transferência nas três moedas.
+- [x] Atualizar a expressão para Conferência de Valores - TCV.
+- [x] Adicionar calculadora flutuante ao selecionar uma quantidade, com transferência do resultado.
+- [x] Verificar cálculos e transferência nas três moedas.
