@@ -24,7 +24,7 @@ export function QuantityCalculator({ label, quantity, onTransfer }: { label: str
     }}>
       <DialogTrigger asChild>
         <Button variant="ghost" title={`Abrir calculadora para ${label}`} aria-label={`Abrir calculadora para ${label}`}
-          className="invisible size-10 shrink-0 bg-accent text-accent-foreground group-focus-within:visible">
+          className="size-10 shrink-0 bg-accent text-accent-foreground">
           <Calculator className="size-4" />
         </Button>
       </DialogTrigger>
