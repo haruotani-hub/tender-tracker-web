@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { QuantityCalculator } from "@/components/quantity-calculator";
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
@@ -16,7 +17,7 @@ function Row({ cur, k, value }: { cur: Currency; k: string; value: number }) {
   const l = label(cur.symbol, value);
   return (
     <div className="space-y-2 rounded-lg border bg-card px-3 py-2">
-      <div className="flex items-center gap-2">
+      <div className="group flex items-center gap-2">
       <div className="min-w-0 flex-1">
         <div className="font-display text-base font-bold leading-tight">{l}</div>
         <div className="font-mono text-xs text-muted-foreground">{fmt(cur.code, value * qty)}</div>
@@ -35,6 +36,7 @@ function Row({ cur, k, value }: { cur: Currency; k: string; value: number }) {
         className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground active:scale-95">
         <Plus className="size-4" />
       </Button>
+      <QuantityCalculator label={l} quantity={qty} onTransfer={set} />
       </div>
       <div className="grid grid-cols-4 gap-2">
         {[-1000, -100, 100, 1000].map((d) => (
