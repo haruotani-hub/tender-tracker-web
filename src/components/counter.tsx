@@ -84,17 +84,7 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
   const counts = useCounts();
   const s = summarize(cur, counts);
   const hasFamilies = cur.families.length > 1;
-  const circV = s.byFamily.filter((b) => b.family.circulating).reduce((a, b) => a + b.value, 0);
-  const nonV = s.byFamily.filter((b) => !b.family.circulating).reduce((a, b) => a + b.value, 0);
-  const diff = circV - nonV;
-  const status =
-    s.pieces === 0
-      ? { text: "Aguardando contagem", tone: "text-muted-foreground" }
-      : diff === 0
-        ? { text: "Circulante e não circulante iguais", tone: "text-success" }
-        : diff > 0
-          ? { text: `Circulante maior em ${fmt(cur.code, diff)}`, tone: "text-success" }
-          : { text: `Não circulante maior em ${fmt(cur.code, -diff)}`, tone: "text-destructive" };
+
 
   const { session } = useSession();
   const isBRL = true;
@@ -132,21 +122,19 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
           </div>
         ))}
 
-        {hasFamilies && (
-          <div className="border-t border-border py-4">
-            <p className="font-display text-sm font-bold">Conferência</p>
-            <dl className="mt-2 space-y-1 font-mono text-sm">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Circulante (cédulas e moedas)</dt><dd>{fmt(cur.code, circV)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Dilacerado (não circulante)</dt><dd>{fmt(cur.code, nonV)}</dd></div>
-            </dl>
-            <p className={`mt-3 border-t pt-3 font-display text-lg font-bold ${status.tone}`}>{status.text}</p>
-          </div>
+        {hasDiff && (
+          <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm font-bold text-destructive">
+            Há diferença em {cur.name}: a justificativa é obrigatória para finalizar a conferência.
+          </p>
         )}
 
         <label className="block">
-          <span className="font-display text-sm font-bold">Observações · {cur.name}</span>
-          <textarea rows={3} maxLength={1000} value={session.obs?.[cur.code] ?? ""}
-            onChange={(e) => updateSession({ obs: { ...session.obs, [cur.code]: e.target.value } })}
+          <span className="font-display text-sm font-bold">
+            Justificativa · {cur.name}
+            {hasDiff && <span className="text-destructive"> · obrigatória</span>}
+          </span>
+          <textarea rows={3} maxLength={1000} value={session.just?.[cur.code] ?? ""}
+            onChange={(e) => updateSession({ just: { ...session.just, [cur.code]: e.target.value } })}
             className="mt-1 w-full rounded-lg border bg-card p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
         </label>
       </main>
