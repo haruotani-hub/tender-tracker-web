@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
@@ -43,7 +43,7 @@ const yn = (v: boolean | null) => (v === null ? "—" : v ? "Sim" : "Não");
 function Resumo() {
   const counts = useCounts();
   const { session: ss } = useSession();
-  const [just, setJust] = useState(ss.justificativa);
+  const [obs, setObs] = useState(ss.observacoes);
   const [e15, setE15] = useState<boolean | null>(ss.entrada15);
   const [cinta, setCinta] = useState<boolean | null>(ss.cinta);
   const [staff, setStaff] = useState<Person[]>(ss.egttvStaff.length ? ss.egttvStaff : [{ name: "", matricula: "" }]);
@@ -51,8 +51,9 @@ function Resumo() {
   const rows = CURRENCIES.map((c) => ({ c, s: summarize(c, counts) }));
   const diffs = rows.map(({ c, s }) => ({ c, mapa: saldoOf(ss, c.code), counted: s.value, d: s.value - saldoOf(ss, c.code) }));
   const hasDiff = diffs.some((x) => x.d !== 0);
+  const missingJust = diffs.filter((x) => x.d !== 0 && !(ss.just?.[x.c.code] ?? "").trim());
   const finished = !!ss.endedAt;
-  const ok = (!hasDiff || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff, "livre");
+  const ok = missingJust.length === 0 && e15 !== null && cinta !== null && validPeople(staff, "livre");
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
@@ -92,7 +93,7 @@ function Resumo() {
               <span className="font-mono text-xl font-bold">{fmt(c.code, s.value)}</span>
             </div>
             <p className="font-mono text-xs text-muted-foreground">{s.pieces} {s.pieces === 1 ? "peça" : "peças"}</p>
-            {ss.obs?.[c.code]?.trim() && <p className="mt-2 whitespace-pre-wrap border-t pt-2 font-mono text-xs"><span className="text-muted-foreground">Obs.: </span>{ss.obs[c.code]}</p>}
+            {ss.just?.[c.code]?.trim() && <p className="mt-2 whitespace-pre-wrap border-t pt-2 font-mono text-xs"><span className="text-muted-foreground">Just.: </span>{ss.just[c.code]}</p>}
             {c.families.length > 1 && (
               <dl className="mt-3 space-y-1 border-t pt-3 font-mono text-sm">
                 {s.byFamily.map(({ family, value, pieces }) => (
@@ -108,7 +109,10 @@ function Resumo() {
         {finished ? (
           <>
             <section className="space-y-1 border-t border-border py-4 font-mono text-sm">
-              {hasDiff && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
+              {diffs.filter(({ c, d }) => d !== 0 && (ss.just?.[c.code] ?? "").trim()).map(({ c }) => (
+                <p key={c.code} className="whitespace-pre-wrap"><span className="text-muted-foreground">Justificativa · {c.name}: </span>{ss.just?.[c.code]}</p>
+              ))}
+              {ss.observacoes.trim() && <p className="whitespace-pre-wrap"><span className="text-muted-foreground">Observações: </span>{ss.observacoes}</p>}
               <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
               <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
               {ss.egttvStaff.map((p, i) => (
@@ -123,13 +127,21 @@ function Resumo() {
           </>
         ) : (
           <section className="space-y-4 border-t border-border py-4">
-            {hasDiff && (
-              <label className="block">
-                <span className="font-display text-sm font-bold text-destructive">Justifique a(s) diferença(s) apontada(s)</span>
-                <textarea value={just} maxLength={1000} onChange={(e) => setJust(e.target.value)} rows={4}
-                  className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
-              </label>
+            {missingJust.length > 0 && (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm font-bold text-destructive">
+                <p>Preencha a justificativa obrigatória:</p>
+                <ul className="mt-1 list-disc pl-5">
+                  {missingJust.map(({ c }) => (
+                    <li key={c.code}><Link to={c.slug} className="underline">{c.name}</Link></li>
+                  ))}
+                </ul>
+              </div>
             )}
+            <label className="block">
+              <span className="font-display text-sm font-bold">Observações</span>
+              <textarea value={obs} maxLength={1000} onChange={(e) => setObs(e.target.value)} rows={4}
+                className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
+            </label>
             <YesNo label="Foi liberada a entrada em até 15 min?" value={e15} onChange={setE15} />
             <YesNo label="Foi solicitada abertura de cinta(s) para conferência?" value={cinta} onChange={setCinta} />
             <div>
@@ -138,7 +150,7 @@ function Resumo() {
             </div>
             <Button variant="ghost" disabled={!ok} className={btnCls}
               onClick={() => updateSession({
-                justificativa: !hasDiff ? "" : just.trim(), entrada15: e15, cinta,
+                observacoes: obs.trim(), entrada15: e15, cinta,
                 egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
                 endedAt: new Date().toISOString(),
               })}>
