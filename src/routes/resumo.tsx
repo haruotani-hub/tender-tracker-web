@@ -93,7 +93,7 @@ function Resumo() {
               <span className="font-mono text-xl font-bold">{fmt(c.code, s.value)}</span>
             </div>
             <p className="font-mono text-xs text-muted-foreground">{s.pieces} {s.pieces === 1 ? "peça" : "peças"}</p>
-            {x.d !== 0 && (ss.just?.[c.code] ?? "").trim() ? null : null}
+            {ss.just?.[c.code]?.trim() && <p className="mt-2 whitespace-pre-wrap border-t pt-2 font-mono text-xs"><span className="text-muted-foreground">Just.: </span>{ss.just[c.code]}</p>}
             {c.families.length > 1 && (
               <dl className="mt-3 space-y-1 border-t pt-3 font-mono text-sm">
                 {s.byFamily.map(({ family, value, pieces }) => (
