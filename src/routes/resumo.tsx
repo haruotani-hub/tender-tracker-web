@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
