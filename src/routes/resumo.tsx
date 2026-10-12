@@ -43,7 +43,7 @@ const yn = (v: boolean | null) => (v === null ? "—" : v ? "Sim" : "Não");
 function Resumo() {
   const counts = useCounts();
   const { session: ss } = useSession();
-  const [just, setJust] = useState(ss.justificativa);
+  const [obs, setObs] = useState(ss.observacoes);
   const [e15, setE15] = useState<boolean | null>(ss.entrada15);
   const [cinta, setCinta] = useState<boolean | null>(ss.cinta);
   const [staff, setStaff] = useState<Person[]>(ss.egttvStaff.length ? ss.egttvStaff : [{ name: "", matricula: "" }]);
@@ -51,8 +51,9 @@ function Resumo() {
   const rows = CURRENCIES.map((c) => ({ c, s: summarize(c, counts) }));
   const diffs = rows.map(({ c, s }) => ({ c, mapa: saldoOf(ss, c.code), counted: s.value, d: s.value - saldoOf(ss, c.code) }));
   const hasDiff = diffs.some((x) => x.d !== 0);
+  const missingJust = diffs.filter((x) => x.d !== 0 && !(ss.just?.[x.c.code] ?? "").trim());
   const finished = !!ss.endedAt;
-  const ok = (!hasDiff || just.trim().length > 0) && e15 !== null && cinta !== null && validPeople(staff, "livre");
+  const ok = missingJust.length === 0 && e15 !== null && cinta !== null && validPeople(staff, "livre");
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
