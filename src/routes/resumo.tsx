@@ -93,7 +93,7 @@ function Resumo() {
               <span className="font-mono text-xl font-bold">{fmt(c.code, s.value)}</span>
             </div>
             <p className="font-mono text-xs text-muted-foreground">{s.pieces} {s.pieces === 1 ? "peça" : "peças"}</p>
-            {ss.obs?.[c.code]?.trim() && <p className="mt-2 whitespace-pre-wrap border-t pt-2 font-mono text-xs"><span className="text-muted-foreground">Obs.: </span>{ss.obs[c.code]}</p>}
+            {x.d !== 0 && (ss.just?.[c.code] ?? "").trim() ? null : null}
             {c.families.length > 1 && (
               <dl className="mt-3 space-y-1 border-t pt-3 font-mono text-sm">
                 {s.byFamily.map(({ family, value, pieces }) => (
@@ -109,7 +109,10 @@ function Resumo() {
         {finished ? (
           <>
             <section className="space-y-1 border-t border-border py-4 font-mono text-sm">
-              {hasDiff && <p><span className="text-muted-foreground">Justificativa: </span>{ss.justificativa}</p>}
+              {diffs.filter(({ c, d }) => d !== 0 && (ss.just?.[c.code] ?? "").trim()).map(({ c }) => (
+                <p key={c.code} className="whitespace-pre-wrap"><span className="text-muted-foreground">Justificativa · {c.name}: </span>{ss.just?.[c.code]}</p>
+              ))}
+              {ss.observacoes.trim() && <p className="whitespace-pre-wrap"><span className="text-muted-foreground">Observações: </span>{ss.observacoes}</p>}
               <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
               <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
               {ss.egttvStaff.map((p, i) => (
@@ -124,13 +127,21 @@ function Resumo() {
           </>
         ) : (
           <section className="space-y-4 border-t border-border py-4">
-            {hasDiff && (
-              <label className="block">
-                <span className="font-display text-sm font-bold text-destructive">Justifique a(s) diferença(s) apontada(s)</span>
-                <textarea value={just} maxLength={1000} onChange={(e) => setJust(e.target.value)} rows={4}
-                  className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
-              </label>
+            {missingJust.length > 0 && (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm font-bold text-destructive">
+                <p>Preencha a justificativa obrigatória:</p>
+                <ul className="mt-1 list-disc pl-5">
+                  {missingJust.map(({ c }) => (
+                    <li key={c.code}><Link to={c.slug} className="underline">{c.name}</Link></li>
+                  ))}
+                </ul>
+              </div>
             )}
+            <label className="block">
+              <span className="font-display text-sm font-bold">Observações</span>
+              <textarea value={obs} maxLength={1000} onChange={(e) => setObs(e.target.value)} rows={4}
+                className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
+            </label>
             <YesNo label="Foi liberada a entrada em até 15 min?" value={e15} onChange={setE15} />
             <YesNo label="Foi solicitada abertura de cinta(s) para conferência?" value={cinta} onChange={setCinta} />
             <div>
@@ -139,7 +150,7 @@ function Resumo() {
             </div>
             <Button variant="ghost" disabled={!ok} className={btnCls}
               onClick={() => updateSession({
-                justificativa: !hasDiff ? "" : just.trim(), entrada15: e15, cinta,
+                observacoes: obs.trim(), entrada15: e15, cinta,
                 egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
                 endedAt: new Date().toISOString(),
               })}>
