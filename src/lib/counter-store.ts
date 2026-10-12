@@ -106,9 +106,9 @@ export type Session = {
   saldoEur: number;
   saldoUsd: number;
   tipo: string;
-  obs: Record<string, string>;
+  just: Record<string, string>; // justificativa por moeda, obrigatória quando houver diferença
   startedAt: string | null;
-  justificativa: string;
+  observacoes: string;
   entrada15: boolean | null;
   cinta: boolean | null;
   egttvStaff: Person[];
@@ -123,8 +123,8 @@ export const TURNOS = ["Matutino", "Vespertino", "Noturno"];
 
 const S_KEY = "contador-session";
 const blank = (): Session => ({
-  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "", obs: {},
-  startedAt: null, justificativa: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
+  employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "", just: {},
+  startedAt: null, observacoes: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
 });
 let session: Session = blank();
 let sReady = false;
