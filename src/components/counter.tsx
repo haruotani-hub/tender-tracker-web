@@ -85,11 +85,11 @@ export function CurrencyPage({ cur }: { cur: Currency }) {
   const s = summarize(cur, counts);
   const hasFamilies = cur.families.length > 1;
 
-
   const { session } = useSession();
   const isBRL = true;
   const mapa = saldoOf(session, cur.code);
   const remaining = mapa - s.value;
+  const hasDiff = mapa - s.value !== 0;
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
       <header className="sticky top-0 z-10 flex items-start justify-between border-b bg-primary px-4 pb-4 pt-5 text-primary-foreground">
