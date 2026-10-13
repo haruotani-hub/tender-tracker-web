@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 export type Family = { id: string; title: string; notes: number[]; coins: number[]; circulating?: boolean };
 export type Currency = {
   code: "BRL" | "EUR" | "USD";
-  slug: "/" | "/euro" | "/dolar";
+  slug: "/real" | "/euro" | "/dolar";
   name: string;
   symbol: string;
   families: Family[];
@@ -16,7 +16,7 @@ const N1 = [10000, 5000, 1000, 500, 100];
 export const CURRENCIES: Currency[] = [
   {
     code: "BRL",
-    slug: "/",
+    slug: "/real",
     name: "Real",
     symbol: "R$",
     families: [

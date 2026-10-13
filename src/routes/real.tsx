@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CurrencyPage } from "@/components/counter";
 import { CURRENCIES } from "@/lib/counter-store";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/real")({
   head: () => ({
     meta: [
       { title: "Conferência de Valores - TCV" },

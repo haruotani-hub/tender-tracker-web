@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conferencias: {
+        Row: {
+          codigo: string
+          criado_em: string
+          dados: Json
+          validacao: Json | null
+        }
+        Insert: {
+          codigo: string
+          criado_em?: string
+          dados: Json
+          validacao?: Json | null
+        }
+        Update: {
+          codigo?: string
+          criado_em?: string
+          dados?: Json
+          validacao?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
