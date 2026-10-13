@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConsultaRouteImport } from './routes/consulta'
 import { Route as DolarRouteImport } from './routes/dolar'
+import { Route as EgttvRouteImport } from './routes/egttv'
 import { Route as EuroRouteImport } from './routes/euro'
+import { Route as RealRouteImport } from './routes/real'
 import { Route as ResumoRouteImport } from './routes/resumo'
 
 const IndexRoute = IndexRouteImport.update({
@@ -19,14 +22,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsultaRoute = ConsultaRouteImport.update({
+  id: '/consulta',
+  path: '/consulta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DolarRoute = DolarRouteImport.update({
   id: '/dolar',
   path: '/dolar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EgttvRoute = EgttvRouteImport.update({
+  id: '/egttv',
+  path: '/egttv',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EuroRoute = EuroRouteImport.update({
   id: '/euro',
   path: '/euro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RealRoute = RealRouteImport.update({
+  id: '/real',
+  path: '/real',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResumoRoute = ResumoRouteImport.update({
@@ -37,35 +55,56 @@ const ResumoRoute = ResumoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dolar' | '/euro' | '/resumo'
+  fullPaths:
+    '/' | '/consulta' | '/dolar' | '/egttv' | '/euro' | '/real' | '/resumo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dolar' | '/euro' | '/resumo'
-  id: '__root__' | '/' | '/dolar' | '/euro' | '/resumo'
+  to: '/' | '/consulta' | '/dolar' | '/egttv' | '/euro' | '/real' | '/resumo'
+  id:
+    | '__root__'
+    | '/'
+    | '/consulta'
+    | '/dolar'
+    | '/egttv'
+    | '/euro'
+    | '/real'
+    | '/resumo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConsultaRoute: typeof ConsultaRoute
   DolarRoute: typeof DolarRoute
+  EgttvRoute: typeof EgttvRoute
   EuroRoute: typeof EuroRoute
+  RealRoute: typeof RealRoute
   ResumoRoute: typeof ResumoRoute
 }
 
@@ -78,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consulta': {
+      id: '/consulta'
+      path: '/consulta'
+      fullPath: '/consulta'
+      preLoaderRoute: typeof ConsultaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dolar': {
       id: '/dolar'
       path: '/dolar'
@@ -85,11 +131,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DolarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/egttv': {
+      id: '/egttv'
+      path: '/egttv'
+      fullPath: '/egttv'
+      preLoaderRoute: typeof EgttvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/euro': {
       id: '/euro'
       path: '/euro'
       fullPath: '/euro'
       preLoaderRoute: typeof EuroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/real': {
+      id: '/real'
+      path: '/real'
+      fullPath: '/real'
+      preLoaderRoute: typeof RealRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resumo': {
@@ -104,8 +164,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConsultaRoute: ConsultaRoute,
   DolarRoute: DolarRoute,
+  EgttvRoute: EgttvRoute,
   EuroRoute: EuroRoute,
+  RealRoute: RealRoute,
   ResumoRoute: ResumoRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Printer } from "lucide-react";
+import { FileDown, Printer } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { saveConference } from "@/lib/conferences.functions";
+import { getToken, setToken } from "@/lib/counter-store";
+import { downloadPdf } from "@/lib/report";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
 import {
@@ -53,6 +57,25 @@ function Resumo() {
   const hasDiff = diffs.some((x) => x.d !== 0);
   const missingJust = diffs.filter((x) => x.d !== 0 && !(ss.just?.[x.c.code] ?? "").trim());
   const finished = !!ss.endedAt;
+  const save = useServerFn(saveConference);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const finalize = async () => {
+    setBusy(true); setErr("");
+    const fin = {
+      ...ss, observacoes: obs.trim(), entrada15: e15, cinta,
+      egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
+      endedAt: new Date().toISOString(),
+    };
+    try {
+      const { codigo } = await save({ data: { token: getToken("caixa") ?? "", dados: { session: { ...fin, codigo: null }, counts } } });
+      updateSession({ ...fin, codigo });
+    } catch (e) {
+      const m = e instanceof Error ? e.message : "";
+      if (/Sessão/.test(m)) { setToken("caixa", null); location.reload(); }
+      setErr(m || "Falha ao salvar a conferência.");
+    } finally { setBusy(false); }
+  };
   const ok = missingJust.length === 0 && e15 !== null && cinta !== null && validPeople(staff, "livre");
 
   return (
@@ -119,6 +142,14 @@ function Resumo() {
                 <p key={i}><span className="text-muted-foreground">EGTTV {i + 1}: </span>{p.name} · {p.matricula}</p>
               ))}
             </section>
+            {ss.codigo && (
+              <section className="rounded-lg border-2 border-primary p-3">
+                <p className="font-display text-sm font-bold">Código para consulta da conferência</p>
+                <p className="mt-1 select-all break-all font-mono text-lg font-bold text-primary">{ss.codigo}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Guarde este código. Ele é usado para consultar e para a validação da EGTTV.</p>
+              </section>
+            )}
+            <Button variant="ghost" onClick={() => downloadPdf({ session: ss, counts }, ss.codigo, null)} className={`${btnCls} flex items-center justify-center gap-2 print:hidden`}><FileDown className="size-4" /> Gerar PDF</Button>
             <div className="grid grid-cols-2 gap-2 print:hidden">
               <Button variant="ghost" onClick={() => window.print()} className={`${btnCls} flex items-center justify-center gap-2`}><Printer className="size-4" /> Imprimir</Button>
               <Button variant="ghost" onClick={() => { if (confirm("Iniciar nova conferência? Os dados atuais serão apagados.")) resetAll(); }}
@@ -148,13 +179,9 @@ function Resumo() {
               <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
               <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" matKind="livre" />
             </div>
-            <Button variant="ghost" disabled={!ok} className={btnCls}
-              onClick={() => updateSession({
-                observacoes: obs.trim(), entrada15: e15, cinta,
-                egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
-                endedAt: new Date().toISOString(),
-              })}>
-              Finalizar conferência
+            {err && <p className="text-sm font-bold text-destructive">{err}</p>}
+            <Button variant="ghost" disabled={!ok || busy} className={btnCls} onClick={finalize}>
+              {busy ? "Salvando…" : "Finalizar conferência"}
             </Button>
           </section>
         )}

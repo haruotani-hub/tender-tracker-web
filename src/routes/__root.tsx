@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { useLocation } from "@tanstack/react-router";
 
 import { IdentityGate } from "../components/identity-gate";
 import appCss from "../styles.css?url";
@@ -120,9 +121,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <IdentityGate>
-        <Outlet />
-      </IdentityGate>
+      <GatedOutlet />
     </QueryClientProvider>
   );
+}
+
+const GATED = ["/real", "/euro", "/dolar", "/resumo"];
+function GatedOutlet() {
+  const { pathname } = useLocation();
+  return GATED.includes(pathname) ? <IdentityGate><Outlet /></IdentityGate> : <Outlet />;
 }
