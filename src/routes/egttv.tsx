@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { btnCls, inputCls, maskName } from "@/components/identity-gate";
 import { Brand, LoginForm } from "@/components/login-form";
 import { ReportView } from "@/components/report-view";
-import { CodeLookup, type Loaded } from "@/routes/consulta";
+import { CodeLookup, type Loaded } from "@/components/code-lookup";
 import { validateConference } from "@/lib/conferences.functions";
 import { getToken, setToken } from "@/lib/counter-store";
 import type { Saved } from "@/lib/report";

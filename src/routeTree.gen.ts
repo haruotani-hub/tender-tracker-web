@@ -9,14 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConsultaRouteImport } from './routes/consulta'
 import { Route as DolarRouteImport } from './routes/dolar'
+import { Route as EgttvRouteImport } from './routes/egttv'
 import { Route as EuroRouteImport } from './routes/euro'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as ResumoRouteImport } from './routes/resumo'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultaRoute = ConsultaRouteImport.update({
+  id: '/consulta',
+  path: '/consulta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DolarRoute = DolarRouteImport.update({
   id: '/dolar',
   path: '/dolar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EgttvRoute = EgttvRouteImport.update({
+  id: '/egttv',
+  path: '/egttv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EuroRoute = EuroRouteImport.update({
@@ -36,34 +54,55 @@ const ResumoRoute = ResumoRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
   '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
   '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/consulta': typeof ConsultaRoute
   '/dolar': typeof DolarRoute
+  '/egttv': typeof EgttvRoute
   '/euro': typeof EuroRoute
   '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/dolar' | '/euro' | '/real' | '/resumo'
+  fullPaths:
+    '/' | '/consulta' | '/dolar' | '/egttv' | '/euro' | '/real' | '/resumo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/dolar' | '/euro' | '/real' | '/resumo'
-  id: '__root__' | '/dolar' | '/euro' | '/real' | '/resumo'
+  to: '/' | '/consulta' | '/dolar' | '/egttv' | '/euro' | '/real' | '/resumo'
+  id:
+    | '__root__'
+    | '/'
+    | '/consulta'
+    | '/dolar'
+    | '/egttv'
+    | '/euro'
+    | '/real'
+    | '/resumo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  ConsultaRoute: typeof ConsultaRoute
   DolarRoute: typeof DolarRoute
+  EgttvRoute: typeof EgttvRoute
   EuroRoute: typeof EuroRoute
   RealRoute: typeof RealRoute
   ResumoRoute: typeof ResumoRoute
@@ -71,11 +110,32 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consulta': {
+      id: '/consulta'
+      path: '/consulta'
+      fullPath: '/consulta'
+      preLoaderRoute: typeof ConsultaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dolar': {
       id: '/dolar'
       path: '/dolar'
       fullPath: '/dolar'
       preLoaderRoute: typeof DolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/egttv': {
+      id: '/egttv'
+      path: '/egttv'
+      fullPath: '/egttv'
+      preLoaderRoute: typeof EgttvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/euro': {
@@ -103,7 +163,10 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  ConsultaRoute: ConsultaRoute,
   DolarRoute: DolarRoute,
+  EgttvRoute: EgttvRoute,
   EuroRoute: EuroRoute,
   RealRoute: RealRoute,
   ResumoRoute: ResumoRoute,

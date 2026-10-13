@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import {
-  EGTTVS, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
+  EGTTVS, getToken, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
 } from "@/lib/counter-store";
 
 export const inputCls =
@@ -87,9 +88,11 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [saldo, setSaldo] = useState("");
   const [sEur, setSEur] = useState("");
   const [sUsd, setSUsd] = useState("");
-  useEffect(() => loadSession(), []);
+  const [logged, setLogged] = useState<boolean | null>(null);
+  useEffect(() => { loadSession(); setLogged(!!getToken("caixa")); }, []);
 
-  if (!ready) return null;
+  if (!ready || logged === null) return null;
+  if (!logged) return <LoginForm role="caixa" title="Login empregado Caixa" onDone={() => setLogged(true)} />;
 
   if (session.employees.length === 0) {
     return (
