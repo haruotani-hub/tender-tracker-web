@@ -9,16 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as DolarRouteImport } from './routes/dolar'
 import { Route as EuroRouteImport } from './routes/euro'
+import { Route as RealRouteImport } from './routes/real'
 import { Route as ResumoRouteImport } from './routes/resumo'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DolarRoute = DolarRouteImport.update({
   id: '/dolar',
   path: '/dolar',
@@ -29,6 +24,11 @@ const EuroRoute = EuroRouteImport.update({
   path: '/euro',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RealRoute = RealRouteImport.update({
+  id: '/real',
+  path: '/real',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumoRoute = ResumoRouteImport.update({
   id: '/resumo',
   path: '/resumo',
@@ -36,48 +36,41 @@ const ResumoRoute = ResumoRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/dolar': typeof DolarRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/dolar': typeof DolarRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/dolar': typeof DolarRoute
   '/euro': typeof EuroRoute
+  '/real': typeof RealRoute
   '/resumo': typeof ResumoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dolar' | '/euro' | '/resumo'
+  fullPaths: '/dolar' | '/euro' | '/real' | '/resumo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dolar' | '/euro' | '/resumo'
-  id: '__root__' | '/' | '/dolar' | '/euro' | '/resumo'
+  to: '/dolar' | '/euro' | '/real' | '/resumo'
+  id: '__root__' | '/dolar' | '/euro' | '/real' | '/resumo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   DolarRoute: typeof DolarRoute
   EuroRoute: typeof EuroRoute
+  RealRoute: typeof RealRoute
   ResumoRoute: typeof ResumoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dolar': {
       id: '/dolar'
       path: '/dolar'
@@ -92,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EuroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/real': {
+      id: '/real'
+      path: '/real'
+      fullPath: '/real'
+      preLoaderRoute: typeof RealRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumo': {
       id: '/resumo'
       path: '/resumo'
@@ -103,9 +103,9 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   DolarRoute: DolarRoute,
   EuroRoute: EuroRoute,
+  RealRoute: RealRoute,
   ResumoRoute: ResumoRoute,
 }
 export const routeTree = rootRouteImport
