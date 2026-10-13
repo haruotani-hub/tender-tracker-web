@@ -113,6 +113,7 @@ export type Session = {
   cinta: boolean | null;
   egttvStaff: Person[];
   endedAt: string | null;
+  codigo: string | null;
 };
 export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte"];
 export const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
@@ -124,7 +125,7 @@ export const TURNOS = ["Matutino", "Vespertino", "Noturno"];
 const S_KEY = "contador-session";
 const blank = (): Session => ({
   employees: [], egttv: "", cidade: "", uf: "", turno: "", dataMapa: "", saldo: 0, saldoEur: 0, saldoUsd: 0, tipo: "", just: {},
-  startedAt: null, observacoes: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null,
+  startedAt: null, observacoes: "", entrada15: null, cinta: null, egttvStaff: [], endedAt: null, codigo: null,
 });
 let session: Session = blank();
 let sReady = false;
@@ -165,3 +166,12 @@ export const parseMoney = (s: string) => {
 };
 export const fmtDateTime = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" }) : "—";
+
+// ---- Login (token assinado pelo servidor, guardado na aba) ----
+export const tokenKey = (role: "caixa" | "egttv") => `tcv-token-${role}`;
+export const getToken = (role: "caixa" | "egttv") => {
+  try { return sessionStorage.getItem(tokenKey(role)); } catch { return null; }
+};
+export const setToken = (role: "caixa" | "egttv", t: string | null) => {
+  try { if (t) sessionStorage.setItem(tokenKey(role), t); else sessionStorage.removeItem(tokenKey(role)); } catch { /* ignore */ }
+};
