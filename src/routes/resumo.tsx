@@ -174,7 +174,7 @@ function Resumo() {
                 className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
             </label>
             {PERGUNTAS.map((q, i) => (
-              <YesNo key={i} label={q} value={quest[i]} onChange={(v) => setQuest((a) => a.map((x, j) => (j === i ? v : x)))} />
+              <YesNo key={i} label={q} value={quest[i] ?? null} onChange={(v) => setQuest((a) => a.map((x, j) => (j === i ? v : x)))} />
             ))}
             <div>
               <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
