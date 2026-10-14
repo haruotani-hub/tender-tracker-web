@@ -23,6 +23,6 @@
 
 # Ajustes de identificação e validação
 
-- [ ] Ajustar tipo, empregados preenchidos, logotipo e situação EGTTV nas duas folhas, sem assinatura ou término.
-- [ ] Bloquear datas futuras no mapa e testar a regra.
-- [ ] Verificar relatório, PDF e seleção da data.
+- [x] Ajustar tipo, empregados preenchidos, logotipo e situação EGTTV nas duas folhas, sem assinatura ou término.
+- [x] Bloquear datas futuras no mapa e testar a regra.
+- [x] Verificar relatório, PDF e seleção da data, incluindo consulta após parecer concordado e não concordado.

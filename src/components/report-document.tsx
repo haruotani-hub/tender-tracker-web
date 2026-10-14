@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { fmt, fmtDateTime, PERGUNTAS } from "@/lib/counter-store";
 import { identifiedReportPeople, reportData, type Saved } from "@/lib/report-data";
 import type { Validacao } from "@/lib/conferences.functions";
-import caixaLogo from "@/assets/logo-caixa.png.asset.json";
+import caixaLogo from "@/assets/caixa.svg.asset.json";
 
 type CurrencyReport = ReturnType<typeof reportData>[number];
 
