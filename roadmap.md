@@ -9,3 +9,9 @@
 - [x] Atualizar a expressão para Conferência de Valores - TCV.
 - [x] Adicionar calculadora flutuante ao selecionar uma quantidade, com transferência do resultado.
 - [x] Verificar cálculos e transferência nas três moedas.
+
+# Relatório conforme modelo enviado
+
+- [ ] Detalhar unidades e valores por tipo no relatório e PDF.
+- [ ] Seguir as duas folhas do modelo, com justificativas em Observações.
+- [ ] Verificar cálculos, consulta do relatório e PDF visualmente.
