@@ -13,3 +13,4 @@
 - Keep the quantity calculator in a shared dialog and evaluate arithmetic through a restricted expression library, so all currencies transfer results consistently without executing code.
 - Derive denomination-level report rows in the shared report-data module for both the screen and PDF, preserving the counting catalog and keeping all arithmetic in integer cents.
 - Render PDF and browser printing from the same two A4 sheets in ReportDocument, fitting overflow uniformly without truncating notes, so both outputs remain identical and retain all report data.
+- Validate map dates through the shared local-calendar helper and the date input limit at submission, so typed dates cannot bypass calendar restrictions.

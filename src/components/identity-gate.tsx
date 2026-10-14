@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { isAllowedMapDate, localToday } from "@/lib/map-date";
 import {
   EGTTVS, getToken, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
 } from "@/lib/counter-store";
@@ -128,10 +129,10 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   }
 
   if (!session.startedAt) {
-    const ok = tipo && turno && data;
+    const ok = tipo && turno && isAllowedMapDate(data);
     return (
       <Shell step={3} title="Mapa da EGTTV">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (ok) updateSession({ turno, dataMapa: data, saldo: parseMoney(saldo), saldoEur: parseMoney(sEur), saldoUsd: parseMoney(sUsd), tipo, startedAt: new Date().toISOString() }); }}>
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); if (ok && isAllowedMapDate(data)) updateSession({ turno, dataMapa: data, saldo: parseMoney(saldo), saldoEur: parseMoney(sEur), saldoUsd: parseMoney(sUsd), tipo, startedAt: new Date().toISOString() }); }}>
           <p className="rounded-lg bg-secondary px-3 py-2 text-sm">{session.egttv} · {session.cidade}/{session.uf}</p>
           <div>
             <span className="font-display text-sm font-bold">Tipo de conferência</span>
@@ -147,7 +148,7 @@ export function IdentityGate({ children }: { children: ReactNode }) {
               <option value="">Selecione…</option>{TURNOS.map((x) => <option key={x}>{x}</option>)}
             </select></label>
           <label className="block"><span className="font-display text-sm font-bold">Data do mapa</span>
-            <input type="date" value={data} onChange={(e) => setData(e.target.value)} className={inputCls} /></label>
+            <input type="date" value={data} max={localToday()} required onChange={(e) => setData(e.target.value)} className={inputCls} /></label>
           <label className="block"><span className="font-display text-sm font-bold">Saldo do mapa · Real (R$)</span>
             <input inputMode="decimal" placeholder="0,00" value={saldo} onChange={(e) => setSaldo(e.target.value.replace(/[^\d.,]/g, ""))}
               className={`${inputCls} font-mono`} /></label>
