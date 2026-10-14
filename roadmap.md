@@ -18,5 +18,5 @@
 
 # PDF e impressão em duas páginas
 
-- [ ] Unificar a apresentação do PDF e da impressão nas duas folhas do modelo.
-- [ ] Verificar as duas páginas, observações e assinaturas sem cortes.
+- [x] Unificar a apresentação do PDF e da impressão nas duas folhas do modelo.
+- [x] Verificar as duas páginas, observações e assinaturas sem cortes (PDF e impressão revisados visualmente; testes e finalização aprovados).
