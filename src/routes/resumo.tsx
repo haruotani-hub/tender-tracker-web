@@ -9,7 +9,7 @@ import { downloadPdf } from "@/lib/report";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
 import {
-  CURRENCIES, fmt, saldoOf, fmtDateTime, resetAll, summarize, updateSession, useCounts, useSession, type Person,
+  CURRENCIES, PERGUNTAS, fmt, saldoOf, fmtDateTime, resetAll, summarize, updateSession, useCounts, useSession, type Person,
 } from "@/lib/counter-store";
 
 export const Route = createFileRoute("/resumo")({
