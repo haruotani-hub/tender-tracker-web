@@ -1,10 +1,10 @@
-# Declaração e autenticação individual
-
 # Botão inicial e código copiado
 
-- [ ] Centralizar o conteúdo do botão Empregado Caixa.
-- [ ] Oferecer confirmação para colar códigos válidos em todas as consultas, com alternativa quando o navegador restringir a leitura.
-- [ ] Verificar confirmação, recusa e consulta pelo código colado.
+- [x] Centralizar o conteúdo do botão Empregado Caixa.
+- [x] Oferecer confirmação para colar códigos válidos em todas as consultas, com alternativa quando o navegador restringir a leitura.
+- [x] Verificar confirmação, recusa e consulta pelo código colado; testes e revisão no celular aprovados.
+
+# Declaração e autenticação individual
 
 - [x] Atualizar declaração sem assinaturas; consulta e PDF verificados.
 - [x] Vincular nome e matrícula às contas individuais e registrar validações com data e horário; 11 testes passaram.
