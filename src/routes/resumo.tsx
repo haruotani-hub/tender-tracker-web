@@ -4,7 +4,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { FileDown, Printer } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { saveConference } from "@/lib/conferences.functions";
-import { getToken, setToken } from "@/lib/counter-store";
+import type { Saved } from "@/lib/report-data";
 import { downloadPdf } from "@/lib/report";
 import { ReportDocument } from "@/components/report-document";
 import { Nav } from "@/components/counter";
@@ -68,11 +68,10 @@ function Resumo() {
       endedAt: new Date().toISOString(),
     };
     try {
-      const { codigo } = await save({ data: { token: getToken("caixa") ?? "", dados: { session: { ...fin, codigo: null }, counts } } });
-      updateSession({ ...fin, codigo });
+      const { codigo, dados } = await save({ data: { dados: { session: { ...fin, codigo: null }, counts } } });
+      updateSession({ ...(JSON.parse(dados) as Saved).session, codigo });
     } catch (e) {
       const m = e instanceof Error ? e.message : "";
-      if (/Sessão/.test(m)) { setToken("caixa", null); location.reload(); }
       setErr(m || "Falha ao salvar a conferência.");
     } finally { setBusy(false); }
   };
@@ -172,7 +171,7 @@ function Resumo() {
             </div>
             {err && <p className="text-sm font-bold text-destructive">{err}</p>}
             <Button variant="ghost" disabled={!ok || busy} className={btnCls} onClick={finalize}>
-              {busy ? "Salvando…" : "Finalizar conferência"}
+              {busy ? "Salvando…" : "Finalizar e validar eletronicamente"}
             </Button>
           </section>
         )}

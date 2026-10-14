@@ -19,28 +19,99 @@ export type Database = {
           codigo: string
           criado_em: string
           dados: Json
+          responsavel_id: string | null
           validacao: Json | null
         }
         Insert: {
           codigo: string
           criado_em?: string
           dados: Json
+          responsavel_id?: string | null
           validacao?: Json | null
         }
         Update: {
           codigo?: string
           criado_em?: string
           dados?: Json
+          responsavel_id?: string | null
           validacao?: Json | null
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          criado_em: string
+          id: string
+          matricula: string
+          nome: string
+        }
+        Insert: {
+          criado_em?: string
+          id: string
+          matricula?: string
+          nome?: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          matricula?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      validacao_auditoria: {
+        Row: {
+          ato: string
+          codigo: string
+          concorda: boolean
+          id: string
+          justificativa: string
+          matricula: string
+          nome: string
+          registrado_em: string
+          responsavel_id: string
+        }
+        Insert: {
+          ato: string
+          codigo: string
+          concorda: boolean
+          id?: string
+          justificativa?: string
+          matricula: string
+          nome: string
+          registrado_em?: string
+          responsavel_id: string
+        }
+        Update: {
+          ato?: string
+          codigo?: string
+          concorda?: boolean
+          id?: string
+          justificativa?: string
+          matricula?: string
+          nome?: string
+          registrado_em?: string
+          responsavel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "validacao_auditoria_codigo_fkey"
+            columns: ["codigo"]
+            isOneToOne: false
+            referencedRelation: "conferencias"
+            referencedColumns: ["codigo"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validate_tcv_individual: {
+        Args: { p_codigo: string; p_concorda: boolean; p_justificativa: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

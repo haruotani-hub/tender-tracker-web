@@ -1,3 +1,9 @@
+# Declaração e autenticação individual
+
+- [x] Atualizar declaração sem assinaturas; consulta e PDF verificados.
+- [x] Vincular nome e matrícula às contas individuais e registrar validações com data e horário; 11 testes passaram.
+- [ ] Verificar uma validação autenticada real: aguarda primeira conta individual cadastrada e confirmada; ainda não há usuários de autenticação.
+
 # Adequação visual CAIXA
 
 - [x] Consultar o material oficial de marca (cópia do manual de janeiro/2017; o ZIP indicado retornou 429).

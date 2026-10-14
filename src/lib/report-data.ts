@@ -1,6 +1,7 @@
 import { CURRENCIES, keyOf, saldoOf, summarize, type Person, type Session } from "@/lib/counter-store";
 
-export type Saved = { session: Session; counts: Record<string, number> };
+export type ValidationIdentity = { nome: string; matricula: string; responsavelId: string; validadoEm: string; autenticacao: "individual" };
+export type Saved = { session: Session & { validacaoCaixa?: ValidationIdentity }; counts: Record<string, number> };
 export function identifiedReportPeople(people: Person[]) {
   return people.filter((person) => person.name.trim() && person.matricula.trim());
 }

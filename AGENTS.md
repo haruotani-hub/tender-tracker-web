@@ -14,3 +14,5 @@
 - Derive denomination-level report rows in the shared report-data module for both the screen and PDF, preserving the counting catalog and keeping all arithmetic in integer cents.
 - Render PDF and browser printing from the same two A4 sheets in ReportDocument, fitting overflow uniformly without truncating notes, so both outputs remain identical and retain all report data.
 - Validate map dates through the shared local-calendar helper and the date input limit at submission, so typed dates cannot bypass calendar restrictions.
+- Authenticate validation acts through individual Cloud accounts and derive identity and timestamps in atomic database functions with append-only audit rows; never trust shared credentials, browser tokens, typed signer names, or client clocks for audit evidence.
+- Keep public code-based consultation read-only; possession of the random conference code grants access to that report, never permission to validate it without an individual account.
