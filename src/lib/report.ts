@@ -87,10 +87,16 @@ export async function createReportPdf(d: Saved, codigo?: string | null, validaca
     title("DETALHAMENTO DA APURAÇÃO DOS VALORES EM CUSTÓDIA");
     const widths = [46, 23, 31, 23, 31, 36];
     const row = (values: string[], h = 6, header = false, unavailable: number[] = []) => {
+      doc.setFont("helvetica", header ? "bold" : "normal"); doc.setFontSize(7.5);
+      h = Math.max(h, ...values.map((value, i) => (doc.splitTextToSize(value, (widths[i] ?? 31) - 3) as string[]).length * 3 + 2));
+      if (y + h > 280) nextPage();
       let x = 10;
       values.forEach((v, i) => { const width = widths[i]; if (width === undefined) return; cell(x, y, width, h, v, header ? band : unavailable.includes(i) ? disabled : paper, header, i ? "right" : "left", 7.5); x += width; }); y += h;
     };
-    row(["TIPO", "UTILIZÁVEL", "", "DILACERADO", "", "TOTAIS"], 6, true);
+    cell(10, y, 46, 6, "TIPO", band, true, "center");
+    cell(56, y, 54, 6, "UTILIZÁVEL", band, true, "center");
+    cell(110, y, 54, 6, "DILACERADO", band, true, "center");
+    cell(164, y, 36, 6, "TOTAIS", band, true, "center"); y += 6;
     row(["DENOMINAÇÃO", "UNIDADE", "VALOR", "UNIDADE", "VALOR", "VALOR"], 6, true);
     for (const r of real.rows) row([r.label, r.usable === null ? "—" : String(r.usable), r.usable === null ? "—" : fmt("BRL", r.usableValue), r.damaged === null ? "—" : String(r.damaged), r.damaged === null ? "—" : fmt("BRL", r.damagedValue), fmt("BRL", r.total)], 5.8, false, [...(r.usable === null ? [1, 2] : []), ...(r.damaged === null ? [3, 4] : [])]);
     row(["SUBTOTAL", String(real.rows.reduce((a, r) => a + (r.usable ?? 0), 0)), fmt("BRL", real.rows.reduce((a, r) => a + r.usableValue, 0)), String(real.rows.reduce((a, r) => a + (r.damaged ?? 0), 0)), fmt("BRL", real.rows.reduce((a, r) => a + r.damagedValue, 0)), fmt("BRL", real.sum.value)], 7, true);

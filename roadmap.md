@@ -12,6 +12,6 @@
 
 # Relatório conforme modelo enviado
 
-- [ ] Detalhar unidades e valores por tipo no relatório e PDF.
-- [ ] Seguir as duas folhas do modelo, com justificativas em Observações.
-- [ ] Verificar cálculos, consulta do relatório e PDF visualmente.
+- [x] Detalhar unidades e valores por tipo no relatório e PDF.
+- [x] Seguir as duas folhas do modelo, com justificativas em Observações.
+- [x] Verificar cálculos, consulta do relatório e PDF visualmente.

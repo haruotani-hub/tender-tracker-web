@@ -5,9 +5,9 @@ import { CURRENCIES } from "@/lib/counter-store";
 export const Route = createFileRoute("/real")({
   head: () => ({
     meta: [
-      { title: "Conferência de Valores - TCV" },
+      { title: "Conferência de Valores - TCV · Real" },
       { name: "description", content: "Contagem de cédulas e moedas, com conferência do saldo do mapa." },
-      { property: "og:title", content: "Conferência de Valores - TCV" },
+      { property: "og:title", content: "Conferência de Valores - TCV · Real" },
       { property: "og:description", content: "Contagem de cédulas e moedas, com conferência do saldo do mapa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
