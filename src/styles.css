@@ -70,6 +70,61 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* The same A4 sheets are used for print and downloadable PDF. */
+.report-document { color: var(--report-ink); background: var(--report-paper); font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.3; }
+.report-sheet { padding: 12px 0; }
+.report-sheet + .report-sheet { border-top: 2px solid var(--report-disabled); margin-top: 16px; }
+.report-band { margin: 0; padding: 5px 6px; background: var(--report-heading); color: var(--report-paper); font-size: 11px; font-weight: bold; text-align: center; }
+.report-title { font-size: 13px; padding: 10px 6px; }
+.report-subtitle { margin: 0; padding: 5px; text-align: center; font-weight: bold; }
+.report-identification { margin: 4px 0 6px; border: 1px solid var(--report-ink); }
+.report-identification > div { display: grid; grid-template-columns: 42% 58%; border-bottom: 1px solid var(--report-disabled); }
+.report-identification dt, .report-identification dd { padding: 4px 6px; overflow-wrap: anywhere; }
+.report-identification dt { font-weight: bold; }
+.report-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9px; font-variant-numeric: tabular-nums; }
+.report-table th, .report-table td { border: 1px solid var(--report-disabled); padding: 4px 3px; text-align: right; overflow-wrap: anywhere; vertical-align: middle; }
+.report-table th:first-child { width: 24%; text-align: left; font-weight: normal; }
+.report-table thead th { background: var(--report-heading); color: var(--report-paper); text-align: center; font-weight: bold; }
+.report-table tfoot { font-weight: bold; }
+.report-unavailable { background: var(--report-disabled); }
+.report-pair { display: flex; justify-content: space-between; gap: 8px; border: 1px solid var(--report-disabled); margin: 0; padding: 5px 6px; }
+.report-pair span { text-align: right; }
+.report-currency { min-width: 0; }
+.report-foreign { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 5px; }
+.report-notes { margin-top: 6px; }
+.report-observation-band { background: var(--brand-orange); color: var(--report-ink); }
+.report-notes > p { white-space: pre-wrap; overflow-wrap: anywhere; min-height: 54px; margin: 0; border: 1px solid var(--report-ink); padding: 7px; }
+.report-questionnaire { margin-top: 8px; }
+.report-questionnaire dl > div { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--report-disabled); padding: 5px 6px; }
+.report-questionnaire dt { flex: 1; }
+.report-questionnaire dd { width: 20px; flex: none; border: 1px solid var(--report-ink); text-align: center; font-weight: bold; }
+.report-declaration { margin: 8px 0; }
+.report-signatures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.report-signatures section > div { padding: 15px 4px 3px; overflow-wrap: anywhere; }
+.report-signature-line { border-top: 1px solid var(--report-ink); padding-top: 2px; }
+.report-copies { font-weight: bold; margin-top: 7px; }
+.report-footer { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 8px; overflow-wrap: anywhere; }
+.report-export-host { position: fixed; left: -10000px; top: 0; width: 210mm; pointer-events: none; }
+.report-export { width: 210mm; font-size: 10px; }
+.report-export .report-sheet { width: 210mm; height: 297mm; padding: 10mm; margin: 0; border: 0; box-sizing: border-box; }
+.report-export .report-sheet-content { zoom: var(--report-fit, 1); }
+.report-export .report-foreign { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.report-export .report-table { font-size: 9px; }
+.report-export .report-table th, .report-export .report-table td { padding: 4px; }
+.report-export .report-sheet:first-child .report-notes > p { min-height: 130px; }
+.report-export .report-signatures section > div { padding-top: 27px; }
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  body:has(.report-document) { margin: 0; padding: 0; background: var(--report-paper); }
+  body:has(.report-document) * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  body:has(.report-document) :not(.report-document):not(.report-document *):not(:has(.report-document)) { display: none !important; }
+  body:has(.report-document) :not(.report-document):has(.report-document) { display: contents !important; }
+  .report-document { width: 210mm; font-size: 10px; }
+  .report-document .report-sheet { width: 210mm; height: 297mm; padding: 10mm; margin: 0; border: 0; box-sizing: border-box; break-after: page; break-inside: avoid; }
+  .report-document .report-sheet:last-child { break-after: auto; }
+  .report-document .report-foreign { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* CAIXA manual, January 2017, flat-color version: RGB 0/102/179 and 247/148/30.
    Futura describes the logo construction, not a mandatory UI typeface.
    No logo is redrawn; UI text uses local sans-serif fallbacks. */
