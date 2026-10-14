@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { saveConference } from "@/lib/conferences.functions";
 import { getToken, setToken } from "@/lib/counter-store";
 import { downloadPdf } from "@/lib/report";
+import { ReportDocument } from "@/components/report-document";
 import { Nav } from "@/components/counter";
 import { PeopleEditor, btnCls, validPeople } from "@/components/identity-gate";
 import {
@@ -94,7 +95,7 @@ function Resumo() {
       </header>
 
       <main className="flex-1 space-y-4 px-4 py-5">
-        <section className="border-t border-border py-4 font-mono text-sm">
+        {!finished && <><section className="border-t border-border py-4 font-mono text-sm">
           <dl className="space-y-1">
             {ss.employees.map((p, i) => (
               <div key={i} className="flex justify-between gap-2"><dt className="text-muted-foreground">Empregado {i + 1}</dt><dd className="text-right">{p.name} · {p.matricula}</dd></div>
@@ -126,22 +127,11 @@ function Resumo() {
               </dl>
             )}
           </section>
-        ))}
+        ))}</>}
 
         {finished ? (
           <>
-            <section className="space-y-1 border-t border-border py-4 font-mono text-sm">
-              {diffs.filter(({ c, d }) => d !== 0 && (ss.just?.[c.code] ?? "").trim()).map(({ c }) => (
-                <p key={c.code} className="whitespace-pre-wrap"><span className="text-muted-foreground">Justificativa · {c.name}: </span>{ss.just?.[c.code]}</p>
-              ))}
-              {ss.observacoes.trim() && <p className="whitespace-pre-wrap"><span className="text-muted-foreground">Observações: </span>{ss.observacoes}</p>}
-              {PERGUNTAS.map((q, i) => (
-                <p key={i}><span className="text-muted-foreground">{q} </span>{yn(ss.quest?.[i] ?? null)}</p>
-              ))}
-              {ss.egttvStaff.map((p, i) => (
-                <p key={i}><span className="text-muted-foreground">EGTTV {i + 1}: </span>{p.name} · {p.matricula}</p>
-              ))}
-            </section>
+            <ReportDocument dados={{ session: ss, counts }} codigo={ss.codigo} />
             {ss.codigo && (
               <section className="rounded-lg border-2 border-primary p-3">
                 <p className="font-display text-sm font-bold">Código para consulta da conferência</p>
