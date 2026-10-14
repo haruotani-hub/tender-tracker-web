@@ -16,3 +16,4 @@
 - Validate map dates through the shared local-calendar helper and the date input limit at submission, so typed dates cannot bypass calendar restrictions.
 - Authenticate validation acts through individual Cloud accounts and derive identity and timestamps in atomic database functions with append-only audit rows; never trust shared credentials, browser tokens, typed signer names, or client clocks for audit evidence.
 - Keep public code-based consultation read-only; possession of the random conference code grants access to that report, never permission to validate it without an individual account.
+- Keep clipboard detection and paste confirmation in the shared CodeLookup, accepting only whole alphanumeric conference codes and retaining manual paste when browser permissions block reading.
