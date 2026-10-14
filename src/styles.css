@@ -76,6 +76,7 @@
 .report-sheet + .report-sheet { border-top: 2px solid var(--report-disabled); margin-top: 16px; }
 .report-band { margin: 0; padding: 5px 6px; background: var(--report-heading); color: var(--report-paper); font-size: 11px; font-weight: bold; text-align: center; }
 .report-title { font-size: 13px; padding: 10px 6px; }
+.report-logo { display: block; width: 105px; height: 42px; object-fit: contain; object-position: left center; margin-bottom: 8px; }
 .report-subtitle { margin: 0; padding: 5px; text-align: center; font-weight: bold; }
 .report-identification { margin: 4px 0 6px; border: 1px solid var(--report-ink); }
 .report-identification > div { display: grid; grid-template-columns: 42% 58%; border-bottom: 1px solid var(--report-disabled); }
@@ -99,9 +100,8 @@
 .report-questionnaire dt { flex: 1; }
 .report-questionnaire dd { width: 20px; flex: none; border: 1px solid var(--report-ink); text-align: center; font-weight: bold; }
 .report-declaration { margin: 8px 0; }
-.report-signatures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.report-signatures section > div { padding: 15px 4px 3px; overflow-wrap: anywhere; }
-.report-signature-line { border-top: 1px solid var(--report-ink); padding-top: 2px; }
+.report-employees { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.report-employees section > div { padding: 6px 4px; border-bottom: 1px solid var(--report-disabled); overflow-wrap: anywhere; }
 .report-copies { font-weight: bold; margin-top: 7px; }
 .report-footer { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 8px; overflow-wrap: anywhere; }
 .report-export-host { position: fixed; left: -10000px; top: 0; width: 210mm; pointer-events: none; }
@@ -112,7 +112,6 @@
 .report-export .report-table { font-size: 9px; }
 .report-export .report-table th, .report-export .report-table td { padding: 4px; }
 .report-export .report-sheet:first-child .report-notes > p { min-height: 130px; }
-.report-export .report-signatures section > div { padding-top: 27px; }
 @media print {
   @page { size: A4 portrait; margin: 0; }
   body:has(.report-document) { margin: 0; padding: 0; background: var(--report-paper); }
