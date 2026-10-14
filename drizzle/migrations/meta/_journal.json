@@ -8,6 +8,13 @@
       "when": 1791856152226,
       "tag": "0000_create_conferencias",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792020933260,
+      "tag": "0001_individual_profiles_and_validation_audit",
+      "breakpoints": true
     }
   ]
 }

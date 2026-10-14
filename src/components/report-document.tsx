@@ -73,13 +73,13 @@ export function ReportDocument({ dados, codigo, validacao, exportMode = false }:
       {real && <><CurrencyTable c={real} /><Notes title="OBSERVAÇÕES · REAL">{real.observations}</Notes></>}
       {footer(1)}
     </div></section>
-    <section className="report-sheet" aria-label="Página 2 · Moeda estrangeira, questionário e assinaturas"><div className="report-sheet-content">
+    <section className="report-sheet" aria-label="Página 2 · Moeda estrangeira, questionário e identificação"><div className="report-sheet-content">
       <h2 className="report-band">MOEDA ESTRANGEIRA</h2>
       <div className="report-foreign">{foreign.map((c) => <CurrencyTable key={c.currency.code} c={c} />)}</div>
       <Notes title="OBSERVAÇÕES · MOEDA ESTRANGEIRA">{foreign.filter((c) => c.observations).map((c) => `${c.currency.name}: ${c.observations}`).join("\n")}</Notes>
       {s.observacoes.trim() && <Notes title="OBSERVAÇÕES GERAIS">{s.observacoes}</Notes>}
       <section className="report-questionnaire"><h2 className="report-band">QUESTIONÁRIO · S (SIM) / N (NÃO)</h2><dl>{PERGUNTAS.map((q, i) => <div key={q}><dt>{q}</dt><dd>{s.quest?.[i] === true ? "S" : s.quest?.[i] === false ? "N" : "—"}</dd></div>)}</dl></section>
-      <p className="report-declaration">As informações acima refletem a realidade e, em decorrência, lavrou-se o presente termo em duas vias de igual teor, para a configuração administrativa do fato.</p>
+      <section className="report-declaration"><h2 className="report-band">DECLARAÇÃO DE CONFERÊNCIA E VALIDAÇÃO</h2><p>As informações registradas neste Termo de Conferência de Valores refletem a apuração realizada pelos membros da Comissão de TCV, conforme os dados e as observações apresentados neste documento.</p><p>Após a conferência, os responsáveis abaixo identificados declaram ciência dos resultados apurados, inclusive das eventuais divergências e justificativas registradas, validando eletronicamente as informações de sua responsabilidade.</p></section>
       <div className="report-employees">{[s.employees, s.egttvStaff].map((people, col) => {
         const identified = identifiedReportPeople(people);
         return identified.length > 0 ? <section key={col}><h2 className="report-band">{col ? "TRANSPORTADORA" : "CAIXA"}</h2>{identified.map((person, i) => <div key={i}><p>Nome: {person.name}</p><p>Matrícula: {person.matricula}</p></div>)}</section> : null;
