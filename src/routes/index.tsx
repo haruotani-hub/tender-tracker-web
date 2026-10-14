@@ -24,7 +24,7 @@ function Home() {
       <Brand />
       <h1 className="font-display text-3xl font-bold">Acesso</h1>
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <Link to="/real" className={`${big} bg-primary text-primary-foreground`}><Building2 className="size-5" /> Empregado Caixa</Link>
+        <Link to="/real" className={`${big} min-w-0 px-3 text-center bg-primary text-primary-foreground`}><Building2 className="size-5 shrink-0" /><span className="min-w-0 leading-tight">Empregado Caixa</span></Link>
         <Link to="/egttv" className={`${big} bg-brand-orange text-primary-foreground`}><Truck className="size-5" /> EGTTV</Link>
       </div>
       <Link to="/consulta" className={`${big} mt-3 border bg-card`}><Search className="size-5" /> Consultar conferência</Link>
