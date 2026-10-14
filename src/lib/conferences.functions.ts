@@ -84,7 +84,7 @@ export const getConference = createServerFn({ method: "POST" })
     const { data: row } = await supabaseAdmin
       .from("conferencias").select("codigo, dados, validacao, criado_em").eq("codigo", data.codigo).maybeSingle();
     if (!row) return null;
-    return { codigo: row.codigo, dados: row.dados as Record<string, unknown>, validacao: row.validacao as Validacao | null, criadoEm: row.criado_em };
+    return { codigo: row.codigo, dados: JSON.stringify(row.dados), validacao: row.validacao as Validacao | null, criadoEm: row.criado_em };
   });
 
 export const validateConference = createServerFn({ method: "POST" })
