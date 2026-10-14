@@ -115,6 +115,7 @@ export type Session = {
   egttvStaff: Person[];
   endedAt: string | null;
   codigo: string | null;
+  validacaoCaixa?: { nome: string; matricula: string; responsavelId: string; validadoEm: string; autenticacao: "individual" };
 };
 export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte", "Preserve"]
 export const PERGUNTAS = [
@@ -176,11 +177,3 @@ export const parseMoney = (s: string) => {
 export const fmtDateTime = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" }) : "—";
 
-// ---- Login (token assinado pelo servidor, guardado na aba) ----
-export const tokenKey = (role: "caixa" | "egttv") => `tcv-token-${role}`;
-export const getToken = (role: "caixa" | "egttv") => {
-  try { return sessionStorage.getItem(tokenKey(role)); } catch { return null; }
-};
-export const setToken = (role: "caixa" | "egttv", t: string | null) => {
-  try { if (t) sessionStorage.setItem(tokenKey(role), t); else sessionStorage.removeItem(tokenKey(role)); } catch { /* ignore */ }
-};
