@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reportData, type Saved } from "@/lib/report-data";
+import { identifiedReportPeople, reportData, type Saved } from "@/lib/report-data";
 
 const saved: Saved = {
   session: { employees: [], egttv: "Preserve", cidade: "São Paulo", uf: "SP", turno: "Matutino", dataMapa: "2026-10-14", saldo: 60000, saldoEur: 0, saldoUsd: 0, tipo: "Agência", just: { BRL: "Diferença identificada", EUR: "Euro conferido", USD: "Dólar conferido" }, startedAt: null, endedAt: null, observacoes: "Anotação livre", entrada15: null, cinta: null, egttvStaff: [], codigo: null },
@@ -7,6 +7,11 @@ const saved: Saved = {
 };
 
 describe("denomination report", () => {
+  it("includes only filled employee identifications, without empty slots", () => {
+    const person = { name: "Haruo Otani", matricula: "C123456" };
+    expect(identifiedReportPeople([person, { name: "", matricula: "" }, { name: "   ", matricula: "C654321" }])).toEqual([person]);
+    expect(identifiedReportPeople([])).toEqual([]);
+  });
   it("reports units and values by note type without merging families", () => {
     const real = reportData(saved).find((c) => c.currency.code === "BRL");
     expect(real?.rows[0]).toMatchObject({ usable: 3, damaged: 2, usableValue: 60000, damagedValue: 40000, total: 100000 });

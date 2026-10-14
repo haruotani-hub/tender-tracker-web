@@ -1,6 +1,10 @@
-import { CURRENCIES, keyOf, saldoOf, summarize, type Session } from "@/lib/counter-store";
+import { CURRENCIES, keyOf, saldoOf, summarize, type Person, type Session } from "@/lib/counter-store";
 
 export type Saved = { session: Session; counts: Record<string, number> };
+export function identifiedReportPeople(people: Person[]) {
+  return people.filter((person) => person.name.trim() && person.matricula.trim());
+}
+
 export type ReportRow = {
   label: string;
   usable: number | null;
