@@ -84,7 +84,8 @@ export function ReportDocument({ dados, codigo, validacao, exportMode = false }:
         const identified = identifiedReportPeople(people);
         return identified.length > 0 ? <section key={col}><h2 className="report-band">{col ? "TRANSPORTADORA" : "CAIXA"}</h2>{identified.map((person, i) => <div key={i}><p>Nome: {person.name}</p><p>Matrícula: {person.matricula}</p></div>)}</section> : null;
       })}</div>
-      <Notes title="SITUAÇÃO DE VALIDAÇÃO EGTTV">{validacao ? `${validacao.concorda ? "validado EGTTV" : "não validado EGTTV"}\nJustificativa: ${validacao.justificativa.trim() || "—"}\n${validacao.nome} · ${validacao.matricula}\n${fmtDateTime(validacao.validadoEm)}` : "Validação EGTTV pendente"}</Notes>
+      {s.validacaoCaixa && <Notes title="VALIDAÇÃO ELETRÔNICA CAIXA">{`${s.validacaoCaixa.nome} · ${s.validacaoCaixa.matricula}\nConta individual: ${s.validacaoCaixa.responsavelId}\nData e horário: ${fmtDateTime(s.validacaoCaixa.validadoEm)}`}</Notes>}
+      <Notes title="SITUAÇÃO DE VALIDAÇÃO EGTTV">{validacao ? `${validacao.concorda ? "validado EGTTV" : "não validado EGTTV"}\nJustificativa: ${validacao.justificativa.trim() || "—"}\n${validacao.nome} · ${validacao.matricula}\n${fmtDateTime(validacao.validadoEm)}\n${validacao.responsavelId ? `Conta individual: ${validacao.responsavelId}` : "Registro anterior sem autenticação individual"}` : "Validação EGTTV pendente"}</Notes>
       <p className="report-copies">1ª via - Caixa · 2ª via - Transportadora</p>
       {footer(2)}
     </div></section>

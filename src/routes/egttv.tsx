@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
-import { btnCls, inputCls, maskName } from "@/components/identity-gate";
+import { btnCls } from "@/components/identity-gate";
 import { Brand, LoginForm } from "@/components/login-form";
 import { ReportView } from "@/components/report-view";
 import { CodeLookup, type Loaded } from "@/components/code-lookup";
 import { validateConference } from "@/lib/conferences.functions";
-import { getToken, setToken } from "@/lib/counter-store";
+import { useIndividualAccount } from "@/components/individual-auth";
+import { supabase } from "@/integrations/supabase/client";
 import type { Saved } from "@/lib/report";
 
 export const Route = createFileRoute("/egttv")({
@@ -25,21 +26,18 @@ export const Route = createFileRoute("/egttv")({
 });
 
 function Egttv() {
-  const [logged, setLogged] = useState<boolean | null>(null);
+  const { user, profile, ready } = useIndividualAccount();
   const [conf, setConf] = useState<Loaded | null>(null);
   const [concorda, setConcorda] = useState<boolean | null>(null);
   const [just, setJust] = useState("");
-  const [nome, setNome] = useState("");
-  const [mat, setMat] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const validate = useServerFn(validateConference);
-  useEffect(() => setLogged(!!getToken("egttv")), []);
 
-  if (logged === null) return null;
-  if (!logged) return <LoginForm role="egttv" title="Login EGTTV" onDone={() => setLogged(true)} />;
+  if (!ready) return null;
+  if (!user || !profile?.nome.trim() || !profile.matricula.trim()) return <LoginForm role="egttv" title="Login EGTTV" onDone={() => {}} />;
 
-  const ok = concorda !== null && (concorda || just.trim()) && nome.trim().split(/\s+/).length >= 2 && mat.trim();
+  const ok = concorda !== null && (concorda || just.trim());
 
   return (
     <div className="mx-auto min-h-screen max-w-xl px-6 py-8 font-sans">
@@ -64,19 +62,15 @@ function Egttv() {
                   <textarea value={just} maxLength={2000} rows={4} onChange={(e) => setJust(e.target.value)}
                     className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" /></label>
               )}
-              <label className="block"><span className="font-display text-sm font-bold">Nome completo do responsável</span>
-                <input value={nome} onChange={(e) => setNome(maskName(e.target.value))} className={inputCls} /></label>
-              <label className="block"><span className="font-display text-sm font-bold">Matrícula funcional</span>
-                <input value={mat} onChange={(e) => setMat(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} className={`${inputCls} font-mono`} /></label>
+              <p className="text-sm font-bold">Responsável: {profile.nome} · {profile.matricula}</p>
               {err && <p className="text-sm font-bold text-destructive">{err}</p>}
               <Button variant="ghost" disabled={!ok || busy} className={btnCls} onClick={async () => {
                 setBusy(true); setErr("");
                 try {
-                  const v = await validate({ data: { token: getToken("egttv") ?? "", codigo: conf.codigo, concorda: !!concorda, justificativa: just, nome: nome.trim(), matricula: mat.trim() } });
+                  const v = await validate({ data: { codigo: conf.codigo, concorda: !!concorda, justificativa: just } });
                   setConf({ ...conf, validacao: v });
                 } catch (e) {
                   const m = e instanceof Error ? e.message : "";
-                  if (/Sessão/.test(m)) { setToken("egttv", null); setLogged(false); }
                   setErr(m || "Falha ao registrar.");
                 } finally { setBusy(false); }
               }}>Registrar validação</Button>
@@ -87,7 +81,7 @@ function Egttv() {
       )}
       <div className="mt-6 flex justify-center gap-4 text-sm text-muted-foreground">
         <Link to="/" className="underline">Início</Link>
-        <button type="button" className="underline" onClick={() => { setToken("egttv", null); setLogged(false); }}>Sair</button>
+        <Button type="button" variant="link" onClick={() => supabase.auth.signOut()}>Sair</Button>
       </div>
     </div>
   );
