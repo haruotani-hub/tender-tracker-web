@@ -1,4 +1,4 @@
-import { CURRENCIES, fmt, fmtDateTime, saldoOf, summarize, type Session } from "@/lib/counter-store";
+import { CURRENCIES, fmt, fmtDateTime, saldoOf, PERGUNTAS, summarize, type Session } from "@/lib/counter-store";
 import type { Validacao } from "@/lib/conferences.functions";
 
 export type Saved = { session: Session; counts: Record<string, number> };
