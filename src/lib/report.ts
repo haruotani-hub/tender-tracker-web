@@ -49,7 +49,7 @@ export async function createReportPdf(d: Saved, codigo?: string | null, validaca
     for (const [index, sheet] of Array.from(sheets).entries()) {
       const canvas = await html2canvas(sheet, { scale: 2, logging: false, windowWidth: 1024 });
       if (index > 0) doc.addPage();
-      doc.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
+      doc.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297, undefined, "FAST");
     }
     return doc;
   } finally {
