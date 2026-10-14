@@ -11,6 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { useLocation } from "@tanstack/react-router";
 
+import { IndividualAuthProvider } from "@/components/individual-auth";
 import { IdentityGate } from "../components/identity-gate";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -121,7 +122,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <GatedOutlet />
+      <IndividualAuthProvider><GatedOutlet /></IndividualAuthProvider>
     </QueryClientProvider>
   );
 }

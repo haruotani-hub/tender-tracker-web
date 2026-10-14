@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { useIndividualAccount } from "@/components/individual-auth";
 import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { isAllowedMapDate, localToday } from "@/lib/map-date";
 import {
-  EGTTVS, getToken, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
+  EGTTVS, TIPOS, TURNOS, UFS, loadSession, parseMoney, updateSession, useSession, type Person,
 } from "@/lib/counter-store";
 
 export const inputCls =
@@ -89,11 +90,11 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [saldo, setSaldo] = useState("");
   const [sEur, setSEur] = useState("");
   const [sUsd, setSUsd] = useState("");
-  const [logged, setLogged] = useState<boolean | null>(null);
-  useEffect(() => { loadSession(); setLogged(!!getToken("caixa")); }, []);
+  const { user, profile, ready: authReady } = useIndividualAccount();
+  useEffect(() => { loadSession(); }, []);
 
-  if (!ready || logged === null) return null;
-  if (!logged) return <LoginForm role="caixa" title="Login empregado Caixa" onDone={() => setLogged(true)} />;
+  if (!ready || !authReady) return null;
+  if (!user || !profile?.nome.trim() || !/^C\d{6}$/.test(profile?.matricula ?? "")) return <LoginForm role="caixa" title="Login empregado Caixa" onDone={() => {}} />;
 
   if (session.employees.length === 0) {
     return (
