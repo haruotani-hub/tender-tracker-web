@@ -15,6 +15,13 @@
       "when": 1792020933260,
       "tag": "0001_individual_profiles_and_validation_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792020975333,
+      "tag": "0002_persist_creation_identity_snapshot",
+      "breakpoints": true
     }
   ]
 }
