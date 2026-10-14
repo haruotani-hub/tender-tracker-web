@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { fmt, fmtDateTime, PERGUNTAS } from "@/lib/counter-store";
-import { reportData, type Saved } from "@/lib/report-data";
+import { identifiedReportPeople, reportData, type Saved } from "@/lib/report-data";
 import type { Validacao } from "@/lib/conferences.functions";
+import caixaLogo from "@/assets/caixa.svg.asset.json";
 
 type CurrencyReport = ReturnType<typeof reportData>[number];
 
@@ -60,13 +61,13 @@ export function ReportDocument({ dados, codigo, validacao, exportMode = false }:
   const footer = (page: number) => <footer className="report-footer"><span>Código: {codigo ?? s.codigo ?? "—"}</span><span>{page}/2</span></footer>;
   return <article ref={ref} className={`report-document ${exportMode ? "report-export" : ""}`}>
     <section className="report-sheet" aria-label="Página 1 · Real"><div className="report-sheet-content">
+      <img className="report-logo" src={caixaLogo.url} alt="CAIXA" />
       <h1 className="report-band report-title">TERMO DE CONFERÊNCIA DE VALORES EM PODER DA EGTTV</h1>
       <p className="report-subtitle">Conferência de Valores - TCV · #INTERNO.CAIXA</p>
       <dl className="report-identification">
         <div><dt>EGTTV / Município / UF</dt><dd>{s.egttv} · {s.cidade}/{s.uf}</dd></div>
-        <div><dt>Custódia</dt><dd>{s.tipo === "Agência" ? "☒" : "☐"} Agência　 {s.tipo === "PAE" ? "☒" : "☐"} PAE</dd></div>
+        <div><dt>Tipo de conferência</dt><dd>Conferência {s.tipo}</dd></div>
         <div><dt>Início da conferência</dt><dd>{fmtDateTime(s.startedAt)}</dd></div>
-        <div><dt>Término da conferência</dt><dd>{fmtDateTime(s.endedAt)}</dd></div>
         <div><dt>Data do mapa / Turno</dt><dd>{s.dataMapa.split("-").reverse().join("/")} · {s.turno}</dd></div>
       </dl>
       {real && <><CurrencyTable c={real} /><Notes title="OBSERVAÇÕES · REAL">{real.observations}</Notes></>}
@@ -78,9 +79,12 @@ export function ReportDocument({ dados, codigo, validacao, exportMode = false }:
       <Notes title="OBSERVAÇÕES · MOEDA ESTRANGEIRA">{foreign.filter((c) => c.observations).map((c) => `${c.currency.name}: ${c.observations}`).join("\n")}</Notes>
       {s.observacoes.trim() && <Notes title="OBSERVAÇÕES GERAIS">{s.observacoes}</Notes>}
       <section className="report-questionnaire"><h2 className="report-band">QUESTIONÁRIO · S (SIM) / N (NÃO)</h2><dl>{PERGUNTAS.map((q, i) => <div key={q}><dt>{q}</dt><dd>{s.quest?.[i] === true ? "S" : s.quest?.[i] === false ? "N" : "—"}</dd></div>)}</dl></section>
-      <p className="report-declaration">As informações acima refletem a realidade e, em decorrência, lavrou-se o presente termo em duas vias de igual teor, que após lido e aprovado, vai por todos abaixo assinado para a configuração administrativa do fato.</p>
-      <div className="report-signatures">{[s.employees, s.egttvStaff].map((people, col) => <section key={col}><h2 className="report-band">{col ? "TRANSPORTADORA" : "CAIXA"}</h2>{Array.from({ length: 3 }, (_, i) => <div key={i}><p className="report-signature-line">Assinatura</p><p>Nome: {people[i]?.name ?? ""}</p><p>Matrícula: {people[i]?.matricula ?? ""}</p></div>)}</section>)}</div>
-      {validacao && <Notes title="VALIDAÇÃO EGTTV">{`${validacao.concorda ? "Concordo" : "Não concordo"} · ${validacao.nome} · ${validacao.matricula}\n${fmtDateTime(validacao.validadoEm)}\n${validacao.justificativa}`}</Notes>}
+      <p className="report-declaration">As informações acima refletem a realidade e, em decorrência, lavrou-se o presente termo em duas vias de igual teor, para a configuração administrativa do fato.</p>
+      <div className="report-employees">{[s.employees, s.egttvStaff].map((people, col) => {
+        const identified = identifiedReportPeople(people);
+        return identified.length > 0 ? <section key={col}><h2 className="report-band">{col ? "TRANSPORTADORA" : "CAIXA"}</h2>{identified.map((person, i) => <div key={i}><p>Nome: {person.name}</p><p>Matrícula: {person.matricula}</p></div>)}</section> : null;
+      })}</div>
+      <Notes title="SITUAÇÃO DE VALIDAÇÃO EGTTV">{validacao ? `${validacao.concorda ? "validado EGTTV" : "não validado EGTTV"}\nJustificativa: ${validacao.justificativa.trim() || "—"}\n${validacao.nome} · ${validacao.matricula}\n${fmtDateTime(validacao.validadoEm)}` : "Validação EGTTV pendente"}</Notes>
       <p className="report-copies">1ª via - Caixa · 2ª via - Transportadora</p>
       {footer(2)}
     </div></section>

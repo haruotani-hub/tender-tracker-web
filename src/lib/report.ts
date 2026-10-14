@@ -10,9 +10,9 @@ export function reportLines(d: Saved, codigo?: string | null, validacao?: Valida
   const L: Array<[string, string?]> = [];
   if (codigo) L.push(["Código", codigo]);
   s.employees.forEach((p, i) => L.push([`Empregado ${i + 1}`, `${p.name} · ${p.matricula}`]));
-  L.push(["Tipo", s.tipo], ["EGTTV", s.egttv], ["Local", `${s.cidade}/${s.uf}`]);
+  L.push(["Tipo", `Conferência ${s.tipo}`], ["EGTTV", s.egttv], ["Local", `${s.cidade}/${s.uf}`]);
   L.push(["Mapa", `${s.dataMapa.split("-").reverse().join("/")} · ${s.turno}`]);
-  L.push(["Início", fmtDateTime(s.startedAt)], ["Término", fmtDateTime(s.endedAt)]);
+  L.push(["Início", fmtDateTime(s.startedAt)]);
   for (const c of CURRENCIES) {
     const sum = summarize(c, d.counts);
     const mapa = saldoOf(s, c.code);
@@ -26,7 +26,7 @@ export function reportLines(d: Saved, codigo?: string | null, validacao?: Valida
   PERGUNTAS.forEach((q, i) => L.push([q, yn(s.quest?.[i] ?? null)]));
   s.egttvStaff.forEach((p, i) => L.push([`EGTTV ${i + 1}`, `${p.name} · ${p.matricula}`]));
   if (validacao) {
-    L.push(["Validação EGTTV", validacao.concorda ? "Concordo" : "Não concordo"], ["Observações da validação", validacao.justificativa], ["Validado por", `${validacao.nome} · ${validacao.matricula}`], ["Validado em", fmtDateTime(validacao.validadoEm)]);
+    L.push(["Validação EGTTV", validacao.concorda ? "validado EGTTV" : "não validado EGTTV"], ["Justificativa", validacao.justificativa], ["Respondido por", `${validacao.nome} · ${validacao.matricula}`], ["Data da validação", fmtDateTime(validacao.validadoEm)]);
   }
   return L;
 }
