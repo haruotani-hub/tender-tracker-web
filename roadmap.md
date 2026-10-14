@@ -1,5 +1,11 @@
 # Adequação visual CAIXA
 
+# Declaração e autenticação individual
+
+- [ ] Atualizar declaração sem assinaturas.
+- [ ] Vincular nome e matrícula às contas individuais e registrar validações com data e horário.
+- [ ] Verificar acesso individual, relatório e rastreabilidade.
+
 - [x] Consultar o material oficial de marca (cópia do manual de janeiro/2017; o ZIP indicado retornou 429).
 - [x] Aplicar cores e formatação nas telas, sem alterar as regras da conferência.
 - [x] Verificar as telas e os testes existentes.
