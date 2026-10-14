@@ -47,7 +47,7 @@ function Egttv() {
       <h1 className="mb-6 font-display text-3xl font-bold">Validação EGTTV</h1>
       {!conf ? <CodeLookup onFound={setConf} /> : (
         <>
-          <ReportView dados={conf.dados as unknown as Saved} codigo={conf.codigo} validacao={conf.validacao} />
+          <ReportView dados={JSON.parse(conf.dados) as Saved} codigo={conf.codigo} validacao={conf.validacao} />
           {!conf.validacao && (
             <section className="mt-6 space-y-4 border-t pt-4">
               <p className="font-display text-sm font-bold">Parecer sobre a conferência</p>

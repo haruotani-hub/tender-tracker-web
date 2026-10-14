@@ -28,7 +28,7 @@ function Consulta() {
       <h1 className="mb-6 font-display text-3xl font-bold">Consultar conferência</h1>
       {conf ? (
         <>
-          <ReportView dados={conf.dados as unknown as Saved} codigo={conf.codigo} validacao={conf.validacao} />
+          <ReportView dados={JSON.parse(conf.dados) as Saved} codigo={conf.codigo} validacao={conf.validacao} />
           <Button variant="ghost" onClick={() => setConf(null)} className="mt-3 h-12 w-full rounded-lg border bg-card font-display font-bold">Consultar outra</Button>
         </>
       ) : <CodeLookup onFound={setConf} />}
