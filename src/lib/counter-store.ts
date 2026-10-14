@@ -111,11 +111,20 @@ export type Session = {
   observacoes: string;
   entrada15: boolean | null;
   cinta: boolean | null;
+  quest?: (boolean | null)[];
   egttvStaff: Person[];
   endedAt: string | null;
   codigo: string | null;
 };
-export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte"];
+export const EGTTVS = ["Brinks", "Protege", "Prosegur", "Corpvs", "Wlataq", "Tbforte", "Preserve"]
+export const PERGUNTAS = [
+  "O acesso dos membros da Comissão de TCV às dependências da base ocorreu dentro do limite de tempo esperado?",
+  "O numerário do Banco está segregado/separado do numerário de outras Instituições?",
+  "Os milheiros estão corretamente amarrados e com o espelho correspondente ao valor de face?",
+  "Alguns milheiros/centenas de padrões diferentes foram escolhidos aleatoriamente e a quantidade conferida?",
+  "Os sacos de milheiros de moedas estão corretamente identificados com o valor total?",
+  "Uma cópia do(s) mapa(s) apresentado(s) pela EGTTV foi(ram) anexada(s) ao presente TCV?",
+];
 export const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 export const TIPOS = ["Agência", "PAE"];
 export const saldoOf = (s: Session, code: string) =>

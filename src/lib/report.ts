@@ -27,7 +27,7 @@ export function reportLines(d: Saved, codigo?: string | null, validacao?: Valida
   }
   L.push(["Finalização"]);
   if (s.observacoes.trim()) L.push(["Observações", s.observacoes]);
-  L.push(["Entrada liberada em até 15 min", yn(s.entrada15)], ["Solicitada abertura de cinta(s)", yn(s.cinta)]);
+  PERGUNTAS.forEach((q, i) => L.push([q, yn(s.quest?.[i] ?? null)]));
   s.egttvStaff.forEach((p, i) => L.push([`EGTTV ${i + 1}`, `${p.name} · ${p.matricula}`]));
   L.push(["Validação EGTTV"]);
   if (validacao) {

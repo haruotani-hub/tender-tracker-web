@@ -48,8 +48,7 @@ function Resumo() {
   const counts = useCounts();
   const { session: ss } = useSession();
   const [obs, setObs] = useState(ss.observacoes);
-  const [e15, setE15] = useState<boolean | null>(ss.entrada15);
-  const [cinta, setCinta] = useState<boolean | null>(ss.cinta);
+  const [quest, setQuest] = useState<(boolean | null)[]>(PERGUNTAS.map((_, i) => ss.quest?.[i] ?? null));
   const [staff, setStaff] = useState<Person[]>(ss.egttvStaff.length ? ss.egttvStaff : [{ name: "", matricula: "" }]);
 
   const rows = CURRENCIES.map((c) => ({ c, s: summarize(c, counts) }));
@@ -63,7 +62,7 @@ function Resumo() {
   const finalize = async () => {
     setBusy(true); setErr("");
     const fin = {
-      ...ss, observacoes: obs.trim(), entrada15: e15, cinta,
+      ...ss, observacoes: obs.trim(), quest,
       egttvStaff: staff.map((p) => ({ name: p.name.trim(), matricula: p.matricula })),
       endedAt: new Date().toISOString(),
     };
@@ -76,7 +75,7 @@ function Resumo() {
       setErr(m || "Falha ao salvar a conferência.");
     } finally { setBusy(false); }
   };
-  const ok = missingJust.length === 0 && e15 !== null && cinta !== null && validPeople(staff, "livre");
+  const ok = missingJust.length === 0 && quest.every((v) => v !== null) && validPeople(staff, "livre");
 
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col font-sans">
@@ -136,8 +135,9 @@ function Resumo() {
                 <p key={c.code} className="whitespace-pre-wrap"><span className="text-muted-foreground">Justificativa · {c.name}: </span>{ss.just?.[c.code]}</p>
               ))}
               {ss.observacoes.trim() && <p className="whitespace-pre-wrap"><span className="text-muted-foreground">Observações: </span>{ss.observacoes}</p>}
-              <p><span className="text-muted-foreground">Entrada liberada em até 15 min: </span>{yn(ss.entrada15)}</p>
-              <p><span className="text-muted-foreground">Solicitada abertura de cinta(s): </span>{yn(ss.cinta)}</p>
+              {PERGUNTAS.map((q, i) => (
+                <p key={i}><span className="text-muted-foreground">{q} </span>{yn(ss.quest?.[i] ?? null)}</p>
+              ))}
               {ss.egttvStaff.map((p, i) => (
                 <p key={i}><span className="text-muted-foreground">EGTTV {i + 1}: </span>{p.name} · {p.matricula}</p>
               ))}
@@ -173,8 +173,9 @@ function Resumo() {
               <textarea value={obs} maxLength={1000} onChange={(e) => setObs(e.target.value)} rows={4}
                 className="mt-1 w-full rounded-lg border bg-background p-3 text-base outline-none focus:ring-2 focus:ring-ring" />
             </label>
-            <YesNo label="Foi liberada a entrada em até 15 min?" value={e15} onChange={setE15} />
-            <YesNo label="Foi solicitada abertura de cinta(s) para conferência?" value={cinta} onChange={setCinta} />
+            {PERGUNTAS.map((q, i) => (
+              <YesNo key={i} label={q} value={quest[i]} onChange={(v) => setQuest((a) => a.map((x, j) => (j === i ? v : x)))} />
+            ))}
             <div>
               <p className="mb-2 font-display text-sm font-bold">Empregados da EGTTV que acompanharam (até 3)</p>
               <PeopleEditor people={staff} onChange={setStaff} matLabel="Matrícula funcional" matKind="livre" />
