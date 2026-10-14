@@ -18,7 +18,8 @@ export function reportLines(d: Saved, codigo?: string | null, validacao?: Valida
     const mapa = saldoOf(s, c.code);
     L.push([c.name], ["Saldo do mapa", fmt(c.code, mapa)], ["Contado", `${fmt(c.code, sum.value)} (${sum.pieces} peças)`]);
     L.push(["Diferença", fmt(c.code, sum.value - mapa)]);
-    if (s.just?.[c.code]?.trim()) L.push([`Observações · ${c.name}`, s.just[c.code]]);
+    const observation = s.just?.[c.code]?.trim();
+    if (observation) L.push([`Observações · ${c.name}`, observation]);
   }
   L.push(["Finalização"]);
   if (s.observacoes.trim()) L.push(["Observações gerais", s.observacoes]);
@@ -43,7 +44,7 @@ export async function createReportPdf(d: Saved, codigo?: string | null, validaca
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
     ctx.fillRect(0, 0, 1, 1);
     const pixel = ctx.getImageData(0, 0, 1, 1).data;
-    return [pixel[0], pixel[1], pixel[2]];
+    return [pixel[0] ?? 0, pixel[1] ?? 0, pixel[2] ?? 0];
   };
   const paper = palette("--report-paper"), ink = palette("--report-ink"), band = palette("--report-heading"), accent = palette("--brand-orange"), white = palette("--report-paper"), disabled = palette("--report-disabled");
   doc.setLineWidth(0.25); doc.setDrawColor(...ink);
@@ -87,7 +88,7 @@ export async function createReportPdf(d: Saved, codigo?: string | null, validaca
     const widths = [46, 23, 31, 23, 31, 36];
     const row = (values: string[], h = 6, header = false, unavailable: number[] = []) => {
       let x = 10;
-      values.forEach((v, i) => { cell(x, y, widths[i], h, v, header ? band : unavailable.includes(i) ? disabled : paper, header, i ? "right" : "left", 7.5); x += widths[i]; }); y += h;
+      values.forEach((v, i) => { const width = widths[i]; if (width === undefined) return; cell(x, y, width, h, v, header ? band : unavailable.includes(i) ? disabled : paper, header, i ? "right" : "left", 7.5); x += width; }); y += h;
     };
     row(["TIPO", "UTILIZÁVEL", "", "DILACERADO", "", "TOTAIS"], 6, true);
     row(["DENOMINAÇÃO", "UNIDADE", "VALOR", "UNIDADE", "VALOR", "VALOR"], 6, true);

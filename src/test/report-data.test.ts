@@ -15,11 +15,11 @@ describe("denomination report", () => {
     expect(real?.difference).toBe(80007);
   });
   it("includes cent coins as units and cents", () => {
-    expect(reportData(saved)[0].rows.at(-1)).toMatchObject({ usable: 7, damaged: null, total: 7 });
+    expect(reportData(saved)[0]?.rows.at(-1)).toMatchObject({ usable: 7, damaged: null, total: 7 });
   });
   it("keeps foreign note quantities and values separate", () => {
-    expect(reportData(saved)[1].rows[0]).toMatchObject({ usable: 2, total: 100000 });
-    expect(reportData(saved)[2].rows[0]).toMatchObject({ usable: 5, total: 50000 });
+    expect(reportData(saved)[1]?.rows[0]).toMatchObject({ usable: 2, total: 100000 });
+    expect(reportData(saved)[2]?.rows[0]).toMatchObject({ usable: 5, total: 50000 });
   });
   it("includes each currency justification in its observations", () => {
     expect(reportData(saved).map((c) => c.observations)).toEqual(["Diferença identificada", "Euro conferido", "Dólar conferido"]);
