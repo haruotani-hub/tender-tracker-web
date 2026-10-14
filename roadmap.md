@@ -20,3 +20,9 @@
 
 - [x] Unificar a apresentação do PDF e da impressão nas duas folhas do modelo.
 - [x] Verificar as duas páginas, observações e assinaturas sem cortes (PDF e impressão revisados visualmente; testes e finalização aprovados).
+
+# Ajustes de identificação e validação
+
+- [ ] Ajustar tipo, empregados preenchidos, logotipo e situação EGTTV nas duas folhas, sem assinatura ou término.
+- [ ] Bloquear datas futuras no mapa e testar a regra.
+- [ ] Verificar relatório, PDF e seleção da data.
