@@ -1,11 +1,10 @@
-import { CURRENCIES, fmt, fmtDateTime, saldoOf, PERGUNTAS, summarize, type Session } from "@/lib/counter-store";
+import { CURRENCIES, fmt, fmtDateTime, saldoOf, PERGUNTAS, summarize } from "@/lib/counter-store";
+import { reportData, type Saved } from "@/lib/report-data";
 import type { Validacao } from "@/lib/conferences.functions";
-
-export type Saved = { session: Session; counts: Record<string, number> };
+export type { Saved } from "@/lib/report-data";
 
 const yn = (v: boolean | null) => (v === null ? "—" : v ? "Sim" : "Não");
 
-/** Linhas do relatório: [rótulo, valor] ou título (valor undefined). */
 export function reportLines(d: Saved, codigo?: string | null, validacao?: Validacao | null) {
   const s = d.session;
   const L: Array<[string, string?]> = [];
@@ -17,49 +16,127 @@ export function reportLines(d: Saved, codigo?: string | null, validacao?: Valida
   for (const c of CURRENCIES) {
     const sum = summarize(c, d.counts);
     const mapa = saldoOf(s, c.code);
-    const diff = sum.value - mapa;
-    L.push([c.name]);
-    L.push(["Saldo do mapa", fmt(c.code, mapa)], ["Contado", `${fmt(c.code, sum.value)} (${sum.pieces} peças)`]);
-    if (c.families.length > 1) sum.byFamily.forEach((f) => L.push([`  ${f.family.title} (${f.pieces})`, fmt(c.code, f.value)]));
-    L.push(["Diferença", diff === 0 ? "sem diferença" : `${diff > 0 ? "sobra" : "falta"} ${fmt(c.code, Math.abs(diff))}`]);
-    const j = s.just?.[c.code]?.trim();
-    if (diff !== 0 && j) L.push(["Justificativa", j]);
+    L.push([c.name], ["Saldo do mapa", fmt(c.code, mapa)], ["Contado", `${fmt(c.code, sum.value)} (${sum.pieces} peças)`]);
+    L.push(["Diferença", fmt(c.code, sum.value - mapa)]);
+    if (s.just?.[c.code]?.trim()) L.push([`Observações · ${c.name}`, s.just[c.code]]);
   }
   L.push(["Finalização"]);
-  if (s.observacoes.trim()) L.push(["Observações", s.observacoes]);
+  if (s.observacoes.trim()) L.push(["Observações gerais", s.observacoes]);
   PERGUNTAS.forEach((q, i) => L.push([q, yn(s.quest?.[i] ?? null)]));
   s.egttvStaff.forEach((p, i) => L.push([`EGTTV ${i + 1}`, `${p.name} · ${p.matricula}`]));
-  L.push(["Validação EGTTV"]);
   if (validacao) {
-    L.push(["Parecer", validacao.concorda ? "Concordo" : "Não concordo"]);
-    if (!validacao.concorda) L.push(["Justificativa", validacao.justificativa]);
-    L.push(["Validado por", `${validacao.nome} · ${validacao.matricula}`], ["Validado em", fmtDateTime(validacao.validadoEm)]);
-  } else L.push(["Situação", "Pendente"]);
+    L.push(["Validação EGTTV", validacao.concorda ? "Concordo" : "Não concordo"], ["Observações da validação", validacao.justificativa], ["Validado por", `${validacao.nome} · ${validacao.matricula}`], ["Validado em", fmtDateTime(validacao.validadoEm)]);
+  }
   return L;
 }
 
-export async function downloadPdf(d: Saved, codigo?: string | null, validacao?: Validacao | null) {
+/** Browser-only export; palette is resolved from the shared semantic CSS tokens. */
+export async function createReportPdf(d: Saved, codigo?: string | null, validacao?: Validacao | null) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const W = 210, M = 15;
-  let y = 18;
-  const brk = (h: number) => { if (y + h > 285) { doc.addPage(); y = 18; } };
-  doc.setFillColor(0, 102, 179); doc.rect(0, 0, W, 8, "F");
-  doc.setFillColor(247, 148, 30); doc.rect(M, 12, 20, 1.2, "F");
-  doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(0, 102, 179);
-  y = 22; doc.text("Conferência de Valores - TCV", M, y); y += 8;
-  doc.setTextColor(0, 0, 0);
-  for (const [k, v] of reportLines(d, codigo, validacao)) {
-    if (v === undefined) {
-      brk(12); y += 3; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 102, 179);
-      doc.text(k, M, y); doc.setTextColor(0, 0, 0); y += 6; continue;
+  const s = d.session;
+  const data = reportData(d);
+  const palette = (token: string): [number, number, number] => {
+    const canvas = document.createElement("canvas"); canvas.width = 1; canvas.height = 1;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return [0, 0, 0];
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+    ctx.fillRect(0, 0, 1, 1);
+    const pixel = ctx.getImageData(0, 0, 1, 1).data;
+    return [pixel[0], pixel[1], pixel[2]];
+  };
+  const paper = palette("--report-paper"), ink = palette("--report-ink"), band = palette("--report-heading"), accent = palette("--brand-orange"), white = palette("--report-paper"), disabled = palette("--report-disabled");
+  doc.setLineWidth(0.25); doc.setDrawColor(...ink);
+  let y = 10;
+  const cell = (x: number, top: number, w: number, h: number, text: string, fill = paper, bold = false, align: "left" | "center" | "right" = "left", size = 8) => {
+    doc.setFillColor(...fill); doc.setTextColor(...(fill === band ? white : ink));
+    doc.rect(x, top, w, h, "FD"); doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(size);
+    const lines = doc.splitTextToSize(text, w - 3) as string[];
+    doc.text(lines, align === "left" ? x + 1.5 : align === "right" ? x + w - 1.5 : x + w / 2, top + h / 2 - (lines.length - 1) * size * 0.176 + size * 0.12, { align, lineHeightFactor: 1.1 });
+  };
+  const title = (text: string, fill = band) => { cell(10, y, 190, 7, text, fill, true, "center", 9); y += 7; };
+  const pair = (label: string, value: string) => { cell(10, y, 65, 7, label, band, true); cell(75, y, 125, 7, value); y += 7; };
+  const footer = () => {
+    doc.setTextColor(...ink); doc.setFontSize(7); doc.setFont("helvetica", "normal");
+    doc.text(`Código: ${codigo ?? s.codigo ?? "—"}`, 10, 287);
+    doc.text(`Término: ${fmtDateTime(s.endedAt)}`, 200, 287, { align: "right" });
+  };
+  const nextPage = () => { footer(); doc.addPage(); y = 10; };
+  const notes = (label: string, text: string, minHeight = 16) => {
+    doc.setFontSize(8); doc.setFont("helvetica", "normal");
+    const lines = doc.splitTextToSize(text || "—", 186) as string[];
+    const perPage = 52;
+    for (let i = 0; i < lines.length; i += perPage) {
+      const chunk = lines.slice(i, i + perPage);
+      const h = Math.max(minHeight, chunk.length * 3.8 + 5);
+      if (y + h + 7 > 280) nextPage();
+      title(i ? `${label} (continuação)` : label, accent);
+      cell(10, y, 190, h, chunk.join("\n")); y += h + 2;
     }
-    doc.setFontSize(10);
-    const lines = doc.splitTextToSize(v, 110) as string[];
-    brk(lines.length * 5);
-    doc.setFont("helvetica", "normal"); doc.setTextColor(90, 90, 90); doc.text(k, M, y);
-    doc.setTextColor(0, 0, 0); doc.text(lines, W - M, y, { align: "right" });
-    y += lines.length * 5;
+  };
+  title("TERMO DE CONFERÊNCIA DE VALORES EM PODER DA EGTTV");
+  cell(10, y, 190, 6, "Conferência de Valores - TCV · #INTERNO.CAIXA", band, true, "center"); y += 6;
+  pair("EGTTV / MUNICÍPIO / UF", `${s.egttv} · ${s.cidade} / ${s.uf}`);
+  pair("DATA / HORA DE INÍCIO", fmtDateTime(s.startedAt));
+  pair("CUSTÓDIA", `${s.tipo === "Agência" ? "[X]" : "[ ]"} Agência     ${s.tipo === "PAE" ? "[X]" : "[ ]"} PAE`);
+  pair("DATA DO MAPA / TURNO", `${s.dataMapa.split("-").reverse().join("/")} · ${s.turno}`);
+  const real = data.find((c) => c.currency.code === "BRL");
+  if (real) {
+    pair("SALDO DO MAPA DA EGTTV", fmt("BRL", real.balance));
+    title("DETALHAMENTO DA APURAÇÃO DOS VALORES EM CUSTÓDIA");
+    const widths = [46, 23, 31, 23, 31, 36];
+    const row = (values: string[], h = 6, header = false, unavailable: number[] = []) => {
+      let x = 10;
+      values.forEach((v, i) => { cell(x, y, widths[i], h, v, header ? band : unavailable.includes(i) ? disabled : paper, header, i ? "right" : "left", 7.5); x += widths[i]; }); y += h;
+    };
+    row(["TIPO", "UTILIZÁVEL", "", "DILACERADO", "", "TOTAIS"], 6, true);
+    row(["DENOMINAÇÃO", "UNIDADE", "VALOR", "UNIDADE", "VALOR", "VALOR"], 6, true);
+    for (const r of real.rows) row([r.label, r.usable === null ? "—" : String(r.usable), r.usable === null ? "—" : fmt("BRL", r.usableValue), r.damaged === null ? "—" : String(r.damaged), r.damaged === null ? "—" : fmt("BRL", r.damagedValue), fmt("BRL", r.total)], 5.8, false, [...(r.usable === null ? [1, 2] : []), ...(r.damaged === null ? [3, 4] : [])]);
+    row(["SUBTOTAL", String(real.rows.reduce((a, r) => a + (r.usable ?? 0), 0)), fmt("BRL", real.rows.reduce((a, r) => a + r.usableValue, 0)), String(real.rows.reduce((a, r) => a + (r.damaged ?? 0), 0)), fmt("BRL", real.rows.reduce((a, r) => a + r.damagedValue, 0)), fmt("BRL", real.sum.value)], 7, true);
+    pair("VALOR FÍSICO APURADO", fmt("BRL", real.sum.value));
+    pair("DIFERENÇA (APURADO - MAPA)", fmt("BRL", real.difference));
+    notes("OBSERVAÇÕES · REAL", real.observations, 22);
   }
+  nextPage();
+  title("MOEDA ESTRANGEIRA");
+  const foreign = [data.find((c) => c.currency.code === "USD"), data.find((c) => c.currency.code === "EUR")];
+  const top = y;
+  let bottom = top;
+  foreign.forEach((c, col) => {
+    if (!c) return;
+    const x = col ? 107 : 10; let yy = top;
+    cell(x, yy, 93, 7, c.currency.name.toUpperCase(), band, true, "center"); yy += 7;
+    cell(x, yy, 93, 7, `Saldo do mapa: ${fmt(c.currency.code, c.balance)}`); yy += 7;
+    ["TIPO", "UNIDADE", "VALOR"].forEach((v, i) => cell(x + i * 31, yy, 31, 6, v, band, true, "center")); yy += 6;
+    c.rows.forEach((r) => { [r.label, String(r.usable), fmt(c.currency.code, r.total)].forEach((v, i) => cell(x + i * 31, yy, 31, 6, v, paper, false, "right")); yy += 6; });
+    cell(x, yy, 93, 7, `Valor físico apurado: ${fmt(c.currency.code, c.sum.value)}`, paper, true); yy += 7;
+    cell(x, yy, 93, 7, `Diferença: ${fmt(c.currency.code, c.difference)}`); yy += 7;
+    bottom = Math.max(bottom, yy);
+  });
+  y = bottom + 3;
+  notes("OBSERVAÇÕES · MOEDA ESTRANGEIRA", foreign.filter((c) => c?.observations).map((c) => `${c?.currency.name}: ${c?.observations}`).join("\n"), 16);
+  if (s.observacoes.trim()) notes("OBSERVAÇÕES GERAIS", s.observacoes);
+  if (y + 55 > 280) nextPage();
+  title("QUESTIONÁRIO · S (SIM) / N (NÃO)");
+  PERGUNTAS.forEach((q, i) => { cell(10, y, 178, 8, q, paper, false, "left", 7.3); cell(188, y, 12, 8, s.quest?.[i] === true ? "S" : s.quest?.[i] === false ? "N" : "—", paper, true, "center"); y += 8; });
+  if (y + 77 > 280) nextPage();
+  cell(10, y, 190, 13, "As informações acima refletem a realidade e, em decorrência, lavrou-se o presente termo em duas vias de igual teor, que após lido e aprovado, vai por todos abaixo assinado para a configuração administrativa do fato.", paper, false, "left", 8); y += 13;
+  const startSign = y;
+  [s.employees, s.egttvStaff].forEach((people, col) => {
+    const x = col ? 107 : 10; let yy = startSign;
+    cell(x, yy, 93, 6, col ? "TRANSPORTADORA" : "CAIXA", band, true, "center"); yy += 6;
+    for (let i = 0; i < 3; i++) {
+      cell(x, yy, 93, 18, `Assinatura: ___________________________________\nNome: ${people[i]?.name ?? ""}\nMatrícula: ${people[i]?.matricula ?? ""}`, paper, false, "left", 7.5); yy += 18;
+    }
+  }); y += 60;
+  if (validacao) notes("VALIDAÇÃO EGTTV", `${validacao.concorda ? "Concordo" : "Não concordo"} · ${validacao.nome} · ${validacao.matricula}\n${fmtDateTime(validacao.validadoEm)}\n${validacao.justificativa || ""}`);
+  if (y + 6 > 280) nextPage();
+  cell(10, y, 190, 6, "1ª via - Caixa     ·     2ª via - Transportadora", paper, true);
+  footer();
+  return doc;
+}
+
+export async function downloadPdf(d: Saved, codigo?: string | null, validacao?: Validacao | null) {
+  const doc = await createReportPdf(d, codigo, validacao);
   doc.save(`conferencia-${codigo ?? "tcv"}.pdf`);
 }
