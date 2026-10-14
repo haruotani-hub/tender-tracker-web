@@ -41,7 +41,7 @@ export async function createReportPdf(d: Saved, codigo?: string | null, validaca
   document.body.appendChild(host);
   const root = createRoot(host);
   try {
-    flushSync(() => root.render(createElement(ReportDocument, { dados: d, codigo, validacao, exportMode: true })));
+    flushSync(() => root.render(createElement(ReportDocument, { dados: d, codigo: codigo ?? null, validacao: validacao ?? null, exportMode: true })));
     await document.fonts.ready;
     fitReportSheets(host);
     const sheets = host.querySelectorAll<HTMLElement>(".report-sheet");
