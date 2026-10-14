@@ -15,3 +15,8 @@
 - [x] Detalhar unidades e valores por tipo no relatório e PDF.
 - [x] Seguir as duas folhas do modelo, com justificativas em Observações.
 - [x] Verificar cálculos, consulta do relatório e PDF visualmente.
+
+# PDF e impressão em duas páginas
+
+- [ ] Unificar a apresentação do PDF e da impressão nas duas folhas do modelo.
+- [ ] Verificar as duas páginas, observações e assinaturas sem cortes.
