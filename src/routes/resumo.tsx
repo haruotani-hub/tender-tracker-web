@@ -173,7 +173,7 @@ function Resumo() {
             </div>
             {err && <p className="text-sm font-bold text-destructive">{err}</p>}
             <Button variant="ghost" disabled={!ok || busy} className={btnCls} onClick={finalize}>
-              {busy ? "Salvando…" : "Finalizar e validar eletronicamente"}
+              {busy ? "Salvando…" : "Finalizar"}
             </Button>
           </section>
         )}
