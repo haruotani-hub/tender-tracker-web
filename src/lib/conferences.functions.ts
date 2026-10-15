@@ -18,7 +18,7 @@ const codeSchema = z.string().regex(/^[A-Za-z0-9]{32}$/);
 // Temporary shared login requested by the user until a new user-validation process is added.
 const credSchema = z.object({ usuario: z.string().max(100), senha: z.string().max(100) });
 function assertCred(c: { usuario: string; senha: string }) {
-  if (c.usuario !== "Admin" || c.senha !== "Admin") throw new Error("Usuário ou senha inválidos.");
+  if (!c.usuario.trim() || c.senha !== "Admin") throw new Error("Matrícula ou senha inválidas.");
 }
 export const checkLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => credSchema.parse(d))
