@@ -1,4 +1,3 @@
-import { useIndividualAccount } from "@/components/individual-auth";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
@@ -59,7 +58,6 @@ function Resumo() {
   const missingJust = diffs.filter((x) => x.d !== 0 && !(ss.just?.[x.c.code] ?? "").trim());
   const finished = !!ss.endedAt;
   const save = useServerFn(saveConference);
-  const { user } = useIndividualAccount();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const finalize = async () => {

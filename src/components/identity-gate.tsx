@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useIndividualAccount } from "@/components/individual-auth";
-import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { isAllowedMapDate, localToday } from "@/lib/map-date";
@@ -163,5 +161,5 @@ export function IdentityGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return <><div className="mx-auto flex max-w-xl items-center justify-between gap-3 border-b border-border px-4 py-2 text-sm print:hidden"><span>{profile.nome} · {profile.matricula}</span><Button variant="link" onClick={signOut}>Sair</Button></div>{children}</>;
+  return <>{children}</>;
 }
