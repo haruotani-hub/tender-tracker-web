@@ -1,3 +1,5 @@
+import { useIndividualAccount } from "@/components/individual-auth";
+import { LoginForm } from "@/components/login-form";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
@@ -78,6 +80,7 @@ function Shell({ step, title, children }: { step: number; title: string; childre
 
 export function IdentityGate({ children }: { children: ReactNode }) {
   const { session, ready } = useSession();
+  const account = useIndividualAccount();
   const [people, setPeople] = useState<Person[]>([{ name: "", matricula: "" }]);
   const [egttv, setEgttv] = useState("");
   const [cidade, setCidade] = useState("");
@@ -90,7 +93,8 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [sUsd, setSUsd] = useState("");
   useEffect(() => { loadSession(); }, []);
 
-  if (!ready) return null;
+  if (!ready || !account.ready) return null;
+  if (!account.user || account.role !== "caixa") return <LoginForm role="caixa" title="Login Empregado Caixa" onDone={() => {}} />;
 
   if (session.employees.length === 0) {
     return (
