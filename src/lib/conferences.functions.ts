@@ -24,9 +24,8 @@ export const checkLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => credSchema.parse(d))
   .handler(async ({ data }) => { assertCred(data); return { ok: true }; });
 export const saveConference = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ cred: credSchema, dados: z.record(z.string(), z.unknown()) }).parse(d))
+  .inputValidator((d) => z.object({ dados: z.record(z.string(), z.unknown()) }).parse(d))
   .handler(async ({ data }) => {
-    assertCred(data.cred);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     for (let i = 0; i < 3; i++) {
       const codigo = generateCode();

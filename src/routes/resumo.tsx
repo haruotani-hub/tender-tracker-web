@@ -70,7 +70,7 @@ function Resumo() {
       endedAt: new Date().toISOString(),
     };
     try {
-      const { codigo, dados } = await save({ data: { cred: user ?? { usuario: "", senha: "" }, dados: { session: { ...fin, codigo: null }, counts } } });
+      const { codigo, dados } = await save({ data: { dados: { session: { ...fin, codigo: null }, counts } } });
       updateSession({ ...(JSON.parse(dados) as Saved).session, codigo });
     } catch (e) {
       const m = e instanceof Error ? e.message : "";

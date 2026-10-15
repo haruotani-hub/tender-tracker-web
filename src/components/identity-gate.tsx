@@ -90,11 +90,9 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [saldo, setSaldo] = useState("");
   const [sEur, setSEur] = useState("");
   const [sUsd, setSUsd] = useState("");
-  const { user, profile, ready: authReady, signOut } = useIndividualAccount();
   useEffect(() => { loadSession(); }, []);
 
-  if (!ready || !authReady) return null;
-  if (!user || !profile?.nome.trim() || !/^C\d{6}$/.test(profile?.matricula ?? "")) return <LoginForm role="caixa" title="Login empregado Caixa" onDone={() => {}} />;
+  if (!ready) return null;
 
   if (session.employees.length === 0) {
     return (
