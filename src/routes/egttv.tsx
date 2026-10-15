@@ -8,7 +8,6 @@ import { ReportView } from "@/components/report-view";
 import { CodeLookup, type Loaded } from "@/components/code-lookup";
 import { validateConference } from "@/lib/conferences.functions";
 import { useIndividualAccount } from "@/components/individual-auth";
-import { supabase } from "@/integrations/supabase/client";
 import type { Saved } from "@/lib/report";
 
 export const Route = createFileRoute("/egttv")({
@@ -26,7 +25,7 @@ export const Route = createFileRoute("/egttv")({
 });
 
 function Egttv() {
-  const { user, profile, ready } = useIndividualAccount();
+  const { user, profile, ready, signOut } = useIndividualAccount();
   const [conf, setConf] = useState<Loaded | null>(null);
   const [concorda, setConcorda] = useState<boolean | null>(null);
   const [just, setJust] = useState("");
@@ -67,7 +66,7 @@ function Egttv() {
               <Button variant="ghost" disabled={!ok || busy} className={btnCls} onClick={async () => {
                 setBusy(true); setErr("");
                 try {
-                  const v = await validate({ data: { codigo: conf.codigo, concorda: !!concorda, justificativa: just } });
+                  const v = await validate({ data: { cred: user, nome: profile.nome, matricula: profile.matricula, codigo: conf.codigo, concorda: !!concorda, justificativa: just } });
                   setConf({ ...conf, validacao: v });
                 } catch (e) {
                   const m = e instanceof Error ? e.message : "";
@@ -81,7 +80,7 @@ function Egttv() {
       )}
       <div className="mt-6 flex justify-center gap-4 text-sm text-muted-foreground">
         <Link to="/" className="underline">Início</Link>
-        <Button type="button" variant="link" onClick={() => supabase.auth.signOut()}>Sair</Button>
+        <Button type="button" variant="link" onClick={signOut}>Sair</Button>
       </div>
     </div>
   );

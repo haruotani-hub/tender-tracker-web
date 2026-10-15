@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useIndividualAccount } from "@/components/individual-auth";
 import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
@@ -91,7 +90,7 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [saldo, setSaldo] = useState("");
   const [sEur, setSEur] = useState("");
   const [sUsd, setSUsd] = useState("");
-  const { user, profile, ready: authReady } = useIndividualAccount();
+  const { user, profile, ready: authReady, signOut } = useIndividualAccount();
   useEffect(() => { loadSession(); }, []);
 
   if (!ready || !authReady) return null;
@@ -166,5 +165,5 @@ export function IdentityGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return <><div className="mx-auto flex max-w-xl items-center justify-between gap-3 border-b border-border px-4 py-2 text-sm print:hidden"><span>{profile.nome} · {profile.matricula}</span><Button variant="link" onClick={() => supabase.auth.signOut()}>Sair</Button></div>{children}</>;
+  return <><div className="mx-auto flex max-w-xl items-center justify-between gap-3 border-b border-border px-4 py-2 text-sm print:hidden"><span>{profile.nome} · {profile.matricula}</span><Button variant="link" onClick={signOut}>Sair</Button></div>{children}</>;
 }

@@ -1,9 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type Role = "caixa" | "egttv";
-export type Validacao = { concorda: boolean; justificativa: string; nome: string; matricula: string; validadoEm: string; responsavelId?: string; autenticacao?: "individual" };
+export type Validacao = { concorda: boolean; justificativa: string; nome: string; matricula: string; validadoEm: string; responsavelId?: string; autenticacao?: "individual" | "compartilhada" };
 const ALNUM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 export function generateCode(len = 32) {
   const out: string[] = [];
@@ -16,17 +15,24 @@ export function generateCode(len = 32) {
   return out.join("");
 }
 const codeSchema = z.string().regex(/^[A-Za-z0-9]{32}$/);
+// Temporary shared login requested by the user until a new user-validation process is added.
+const credSchema = z.object({ usuario: z.string().max(100), senha: z.string().max(100) });
+function assertCred(c: { usuario: string; senha: string }) {
+  if (c.usuario !== "Admin" || c.senha !== "Admin") throw new Error("Usuário ou senha inválidos.");
+}
+export const checkLogin = createServerFn({ method: "POST" })
+  .inputValidator((d) => credSchema.parse(d))
+  .handler(async ({ data }) => { assertCred(data); return { ok: true }; });
 export const saveConference = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ dados: z.record(z.string(), z.unknown()) }).parse(d))
-  .handler(async ({ data, context }) => {
+  .inputValidator((d) => z.object({ cred: credSchema, dados: z.record(z.string(), z.unknown()) }).parse(d))
+  .handler(async ({ data }) => {
+    assertCred(data.cred);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     for (let i = 0; i < 3; i++) {
       const codigo = generateCode();
-      const { error } = await context.supabase.from("conferencias").insert({ codigo, dados: data.dados as never, responsavel_id: context.userId });
+      const { error } = await supabaseAdmin.from("conferencias").insert({ codigo, dados: data.dados as never });
       if (error) { if (error.code === "23505") continue; throw new Error(error.message); }
-      const { data: row, error: readError } = await context.supabase.from("conferencias").select("dados").eq("codigo", codigo).single();
-      if (readError) throw new Error("Conferência salva; consulte pelo código " + codigo);
-      return { codigo, dados: JSON.stringify(row.dados) };
+      return { codigo, dados: JSON.stringify(data.dados) };
     }
     throw new Error("Falha ao gerar código.");
   });
@@ -40,10 +46,13 @@ export const getConference = createServerFn({ method: "POST" })
     return { codigo: row.codigo, dados: JSON.stringify(row.dados), validacao: row.validacao as Validacao | null, criadoEm: row.criado_em };
   });
 export const validateConference = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ codigo: codeSchema, concorda: z.boolean(), justificativa: z.string().max(2000) }).refine((v) => v.concorda || v.justificativa.trim().length > 0, "Justificativa obrigatória").parse(d))
-  .handler(async ({ data, context }) => {
-    const { data: result, error } = await context.supabase.rpc("validate_tcv_individual", { p_codigo: data.codigo, p_concorda: data.concorda, p_justificativa: data.justificativa });
+  .inputValidator((d) => z.object({ cred: credSchema, nome: z.string().trim().min(3).max(200), matricula: z.string().trim().min(1).max(50), codigo: codeSchema, concorda: z.boolean(), justificativa: z.string().max(2000) }).refine((v) => v.concorda || v.justificativa.trim().length > 0, "Justificativa obrigatória").parse(d))
+  .handler(async ({ data }) => {
+    assertCred(data.cred);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const v: Validacao = { concorda: data.concorda, justificativa: data.concorda ? "" : data.justificativa.trim(), nome: data.nome, matricula: data.matricula, validadoEm: new Date().toISOString(), autenticacao: "compartilhada" };
+    const { data: rows, error } = await supabaseAdmin.from("conferencias").update({ validacao: v as never }).eq("codigo", data.codigo).is("validacao", null).select("codigo");
     if (error) throw new Error(error.message);
-    return result as Validacao;
+    if (!rows?.length) throw new Error("Conferência não encontrada ou já validada");
+    return v;
   });
