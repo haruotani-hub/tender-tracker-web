@@ -18,14 +18,15 @@ const codeSchema = z.string().regex(/^[A-Za-z0-9]{32}$/);
 // Temporary shared login requested by the user until a new user-validation process is added.
 const credSchema = z.object({ usuario: z.string().max(100), senha: z.string().max(100) });
 function assertCred(c: { usuario: string; senha: string }) {
-  if (!c.usuario.trim() || c.senha !== "Admin") throw new Error("Matrícula ou senha inválidas.");
+  if (!c.usuario.trim() || c.senha.trim().toLowerCase() !== "admin") throw new Error("Matrícula ou senha inválidas.");
 }
 export const checkLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => credSchema.parse(d))
   .handler(async ({ data }) => { assertCred(data); return { ok: true }; });
 export const saveConference = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ dados: z.record(z.string(), z.unknown()) }).parse(d))
+  .inputValidator((d) => z.object({ cred: credSchema, dados: z.record(z.string(), z.unknown()) }).parse(d))
   .handler(async ({ data }) => {
+    assertCred(data.cred);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     for (let i = 0; i < 3; i++) {
       const codigo = generateCode();

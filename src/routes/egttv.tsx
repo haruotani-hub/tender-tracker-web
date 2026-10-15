@@ -25,7 +25,7 @@ export const Route = createFileRoute("/egttv")({
 });
 
 function Egttv() {
-  const { user, profile, ready, signOut } = useIndividualAccount();
+  const { role, user, profile, ready, signOut } = useIndividualAccount();
   const [conf, setConf] = useState<Loaded | null>(null);
   const [concorda, setConcorda] = useState<boolean | null>(null);
   const [just, setJust] = useState("");
@@ -34,7 +34,7 @@ function Egttv() {
   const validate = useServerFn(validateConference);
 
   if (!ready) return null;
-  if (!user || !profile?.nome.trim() || !profile.matricula.trim()) return <LoginForm role="egttv" title="Login EGTTV" onDone={() => {}} />;
+  if (!user || role !== "egttv" || !profile?.nome.trim() || !profile.matricula.trim()) return <LoginForm role="egttv" title="Login EGTTV" onDone={() => {}} />;
 
   const ok = concorda !== null && (concorda || just.trim());
 

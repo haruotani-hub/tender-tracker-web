@@ -23,7 +23,7 @@ export function LoginForm({ role, title, onDone }: { role: "caixa" | "egttv"; ti
       try {
         if (role === "caixa" ? !/^C\d{6}$/.test(matricula) : !matricula.trim()) throw new Error("Informe uma matrícula válida.");
         await check({ data: { usuario: matricula, senha } });
-        signIn({ usuario: matricula, senha, nome: matricula, matricula }); onDone();
+        signIn({ usuario: matricula, senha, nome: matricula, matricula, role }); onDone();
       } catch (err) { setMessage(err instanceof Error ? err.message : "Não foi possível entrar."); } finally { setBusy(false); }
     }}>
       <label className="block"><span className="font-display text-sm font-bold">{role === "caixa" ? "Matrícula Caixa" : "Matrícula funcional"}</span><input required value={matricula} onChange={(e) => setMatricula(role === "caixa" ? maskCaixaMatricula(e.target.value) : e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} className={inputCls} /></label>
