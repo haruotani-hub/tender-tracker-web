@@ -1,3 +1,4 @@
+import { useIndividualAccount } from "@/components/individual-auth";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
@@ -58,6 +59,7 @@ function Resumo() {
   const missingJust = diffs.filter((x) => x.d !== 0 && !(ss.just?.[x.c.code] ?? "").trim());
   const finished = !!ss.endedAt;
   const save = useServerFn(saveConference);
+  const account = useIndividualAccount();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const finalize = async () => {
@@ -68,7 +70,7 @@ function Resumo() {
       endedAt: new Date().toISOString(),
     };
     try {
-      const { codigo, dados } = await save({ data: { dados: { session: { ...fin, codigo: null }, counts } } });
+      const { codigo, dados } = await save({ data: { cred: account.user ?? { usuario: "", senha: "" }, dados: { session: { ...fin, codigo: null }, counts } } });
       updateSession({ ...(JSON.parse(dados) as Saved).session, codigo });
     } catch (e) {
       const m = e instanceof Error ? e.message : "";
