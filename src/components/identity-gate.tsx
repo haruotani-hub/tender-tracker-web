@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useIndividualAccount } from "@/components/individual-auth";
-import { LoginForm } from "@/components/login-form";
 import { useEffect, useState, type ReactNode } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { isAllowedMapDate, localToday } from "@/lib/map-date";
@@ -90,11 +88,9 @@ export function IdentityGate({ children }: { children: ReactNode }) {
   const [saldo, setSaldo] = useState("");
   const [sEur, setSEur] = useState("");
   const [sUsd, setSUsd] = useState("");
-  const { user, profile, ready: authReady, signOut } = useIndividualAccount();
   useEffect(() => { loadSession(); }, []);
 
-  if (!ready || !authReady) return null;
-  if (!user || !profile?.nome.trim() || !/^C\d{6}$/.test(profile?.matricula ?? "")) return <LoginForm role="caixa" title="Login empregado Caixa" onDone={() => {}} />;
+  if (!ready) return null;
 
   if (session.employees.length === 0) {
     return (
@@ -165,5 +161,5 @@ export function IdentityGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return <><div className="mx-auto flex max-w-xl items-center justify-between gap-3 border-b border-border px-4 py-2 text-sm print:hidden"><span>{profile.nome} · {profile.matricula}</span><Button variant="link" onClick={signOut}>Sair</Button></div>{children}</>;
+  return <>{children}</>;
 }
